@@ -15,6 +15,7 @@ export const Layout = ({ children }: LayoutProps) => {
     { path: '/', label: 'Home' },
     { path: '/learn/frequency', label: '🎓 Frequenze' },
     { path: '/learn/intervals', label: '🎓 Intervalli' },
+    { path: '/learn/chords', label: '🎓 Accordi' }, 
     { path: '/train/frequency', label: '🎯 Freq Quiz' },
     { path: '/train/intervals', label: '🎯 Interval Quiz' },
   ];

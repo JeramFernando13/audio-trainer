@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { Home } from './components/Home';
 import { FrequencyLearn } from './components/FrequencyLearn';
 import { IntervalsLearn } from './components/IntervalLearn';
+import { ChordsLearn } from './components/ChordsLearn';
 import { EarTraining } from './components/EarTraining';
 import { FrequencyTraining } from './components/FrequencyTraining';
 
@@ -16,6 +17,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/learn/frequency" element={<FrequencyLearn />} />
             <Route path="/learn/intervals" element={<IntervalsLearn />} />
+            <Route path="/learn/chords" element={<ChordsLearn />} />
             <Route path="/train/frequency" element={<FrequencyTraining />} />
             <Route path="/train/intervals" element={<EarTraining />} />
           </Routes>

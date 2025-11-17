@@ -120,17 +120,33 @@ const INTERVALS_GUIDE = [
     color: 'bg-purple-900',
   },
 ];
+const ROOT_NOTES = [
+  { name: 'C', freq: 261.63 },
+  { name: 'C#/Db', freq: 277.18 },
+  { name: 'D', freq: 293.66 },
+  { name: 'D#/Eb', freq: 311.13 },
+  { name: 'E', freq: 329.63 },
+  { name: 'F', freq: 349.23 },
+  { name: 'F#/Gb', freq: 369.99 },
+  { name: 'G', freq: 392.00 },
+  { name: 'G#/Ab', freq: 415.30 },
+  { name: 'A', freq: 440.00 },
+  { name: 'A#/Bb', freq: 466.16 },
+  { name: 'B', freq: 493.88 },
+];
 
 export const IntervalsLearn = () => {
   const { playInterval } = useAudio();
   const [selectedInterval, setSelectedInterval] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playMode, setPlayMode] = useState<'melodic' | 'harmonic'>('melodic');
+  const [rootNote, setRootNote] = useState(0);
+
 
   const playSelectedInterval = async (index: number) => {
     setSelectedInterval(index);
     setIsPlaying(true);
-    const baseFreq = 261.63; // C4
+    const baseFreq = ROOT_NOTES[rootNote].freq; // C4
     await playInterval(baseFreq, INTERVALS_GUIDE[index].semitones);
     setTimeout(() => setIsPlaying(false), 1500);
   };
@@ -142,6 +158,27 @@ export const IntervalsLearn = () => {
         <p className="text-gray-400 mb-4">
           Clicca su ogni intervallo per ascoltarlo. Partiamo sempre dal Do centrale (C4 = 261.63 Hz).
         </p>
+
+        <div className="my-4">
+          <label className="block text-sm font-medium text-gray-400 mb-2">
+            Nota di partenza:
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {ROOT_NOTES.map((note, index) => (
+              <button
+                key={note.name}
+                onClick={() => setRootNote(index)}
+                className={`px-3 py-1 rounded font-mono text-sm transition ${
+                  rootNote === index
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                {note.name}
+              </button>
+            ))}
+          </div>
+        </div>
         
         <div className="flex gap-4 mb-4">
           <button

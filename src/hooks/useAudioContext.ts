@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import * as Tone from 'tone';
 
 export const useAudioContext = () => {
-  const synthRef = useRef<Tone.Synth | null>(null);
+  const synthRef = useRef<Tone.PolySynth | null>(null);
   const noiseRef = useRef<Tone.Noise | null>(null);
   const filterRef = useRef<Tone.Filter | null>(null);
   const volumeRef = useRef<Tone.Volume | null>(null);
@@ -10,7 +10,7 @@ export const useAudioContext = () => {
 
   useEffect(() => {
     volumeRef.current = new Tone.Volume(volume).toDestination();
-    synthRef.current = new Tone.Synth().connect(volumeRef.current);
+    synthRef.current = new Tone.PolySynth().connect(volumeRef.current);
     noiseRef.current = new Tone.Noise('pink');
     filterRef.current = new Tone.Filter(1000, 'peaking');
     filterRef.current.Q.value = 5;

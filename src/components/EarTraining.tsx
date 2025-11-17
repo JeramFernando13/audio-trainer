@@ -16,6 +16,20 @@ const INTERVALS = [
   { name: 'Settima maggiore', semitones: 11 },
   { name: 'Ottava', semitones: 12 },
 ];
+const ROOT_NOTES = [
+  { name: 'C', freq: 261.63 },
+  { name: 'C#/Db', freq: 277.18 },
+  { name: 'D', freq: 293.66 },
+  { name: 'D#/Eb', freq: 311.13 },
+  { name: 'E', freq: 329.63 },
+  { name: 'F', freq: 349.23 },
+  { name: 'F#/Gb', freq: 369.99 },
+  { name: 'G', freq: 392.00 },
+  { name: 'G#/Ab', freq: 415.30 },
+  { name: 'A', freq: 440.00 },
+  { name: 'A#/Bb', freq: 466.16 },
+  { name: 'B', freq: 493.88 },
+];
 
 export const EarTraining = () => {
   const { playInterval } = useAudio();
@@ -23,6 +37,7 @@ export const EarTraining = () => {
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [feedback, setFeedback] = useState<string>('');
   const [showAnswer, setShowAnswer] = useState(false);
+  const [rootNote, setRootNote] = useState(0);
 
   const generateNewInterval = () => {
     const randomIndex = Math.floor(Math.random() * INTERVALS.length);
@@ -30,7 +45,7 @@ export const EarTraining = () => {
     setFeedback('');
     setShowAnswer(false);
     
-    const baseFreq = 261.63; // C4
+    const baseFreq = ROOT_NOTES[rootNote].freq;
     playInterval(baseFreq, INTERVALS[randomIndex].semitones);
   };
 
@@ -53,7 +68,7 @@ export const EarTraining = () => {
 
   const repeatInterval = () => {
     if (currentInterval === null) return;
-    const baseFreq = 261.63;
+    const baseFreq = ROOT_NOTES[rootNote].freq;
     playInterval(baseFreq, INTERVALS[currentInterval].semitones);
   };
 
@@ -61,6 +76,26 @@ export const EarTraining = () => {
     <div className="space-y-6">
       <div className="bg-gray-800 rounded-lg p-6">
         <h2 className="text-2xl font-bold mb-4">Riconoscimento Intervalli</h2>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-400 mb-2">
+            Nota di partenza:
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {ROOT_NOTES.map((note, index) => (
+              <button
+                key={note.name}
+                onClick={() => setRootNote(index)}
+                className={`px-3 py-1 rounded font-mono text-sm transition ${
+                  rootNote === index
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                {note.name}
+              </button>
+            ))}
+          </div>
+        </div>
         <p className="text-gray-400 mb-6">
           Ascolta l'intervallo e indovina quale è. Partiamo sempre dal Do centrale (C4).
         </p>
