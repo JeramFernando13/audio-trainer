@@ -53,7 +53,7 @@ export const useAudioContext = () => {
       noiseRef.current.start();
       setTimeout(() => {
         noiseRef.current?.stop();
-      }, 2000);
+      }, 3000);
     }
   };
 
