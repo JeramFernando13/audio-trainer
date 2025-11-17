@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAudioContext } from '../hooks/useAudioContext';
+import { useAudio } from '../hooks/useAudio';
 
 const INTERVALS = [
   { name: 'Unisono', semitones: 0 },
@@ -18,7 +18,7 @@ const INTERVALS = [
 ];
 
 export const EarTraining = () => {
-  const { playInterval } = useAudioContext();
+  const { playInterval } = useAudio();
   const [currentInterval, setCurrentInterval] = useState<number | null>(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [feedback, setFeedback] = useState<string>('');

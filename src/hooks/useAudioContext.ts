@@ -1,25 +1,36 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import * as Tone from 'tone';
 
 export const useAudioContext = () => {
   const synthRef = useRef<Tone.Synth | null>(null);
   const noiseRef = useRef<Tone.Noise | null>(null);
   const filterRef = useRef<Tone.Filter | null>(null);
+  const volumeRef = useRef<Tone.Volume | null>(null);
+  const [volume, setVolume] = useState(-12);
 
   useEffect(() => {
-    synthRef.current = new Tone.Synth().toDestination();
+    volumeRef.current = new Tone.Volume(volume).toDestination();
+    synthRef.current = new Tone.Synth().connect(volumeRef.current);
     noiseRef.current = new Tone.Noise('pink');
-    filterRef.current = new Tone.Filter(1000, 'peaking').toDestination();
+    filterRef.current = new Tone.Filter(1000, 'peaking');
     filterRef.current.Q.value = 5;
     filterRef.current.gain.value = 12;
     noiseRef.current.connect(filterRef.current);
+    filterRef.current.connect(volumeRef.current);
 
     return () => {
       synthRef.current?.dispose();
       noiseRef.current?.dispose();
       filterRef.current?.dispose();
+      volumeRef.current?.dispose();
     };
-  }, []);
+  }, [volume]);
+
+  useEffect(() => {
+    if (volumeRef.current) {
+      volumeRef.current.volume.value = volume;
+    }
+  }, [volume]);
 
   const playNote = async (frequency: number, duration: string = '8n') => {
     await Tone.start();
@@ -29,7 +40,6 @@ export const useAudioContext = () => {
   const playInterval = async (baseFreq: number, semitones: number) => {
     await Tone.start();
     const secondFreq = baseFreq * Math.pow(2, semitones / 12);
-    
     synthRef.current?.triggerAttackRelease(baseFreq, '4n');
     setTimeout(() => {
       synthRef.current?.triggerAttackRelease(secondFreq, '4n');
@@ -47,5 +57,5 @@ export const useAudioContext = () => {
     }
   };
 
-  return { playNote, playInterval, playFrequencyBoost };
+  return { playNote, playInterval, playFrequencyBoost, volume, setVolume };
 };

@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useAudioContext } from '../hooks/useAudioContext';
-
+import { useAudio } from '../hooks/useAudio';
 const FREQUENCY_BANDS = [
   { name: 'Sub Bass', freq: 60 },
   { name: 'Bass', freq: 120 },
@@ -13,7 +12,7 @@ const FREQUENCY_BANDS = [
 ];
 
 export const FrequencyTraining = () => {
-  const { playFrequencyBoost } = useAudioContext();
+  const { playFrequencyBoost } = useAudio();
   const [currentFreq, setCurrentFreq] = useState<number | null>(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [feedback, setFeedback] = useState<string>('');
