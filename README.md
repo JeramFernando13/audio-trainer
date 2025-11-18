@@ -30,7 +30,3 @@ Un'app web interattiva per allenare l'orecchio musicale, pensata sia per musicis
 - **Build**: Vite
 - **Package Manager**: pnpm
 - **Deployment**: Vercel
-
-## 🚀 Setup Locale
-
-```bash
