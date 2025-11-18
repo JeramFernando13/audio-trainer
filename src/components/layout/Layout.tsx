@@ -33,7 +33,7 @@ export const Layout = ({ children }: LayoutProps) => {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group">
               <AudioLines className="w-6 h-6" />
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
+              <h1 className="hidden md:flex text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
                 Audio Trainer
               </h1>
             </Link>
