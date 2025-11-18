@@ -36,6 +36,11 @@ export const useAudioContext = () => {
     await Tone.start();
     synthRef.current?.triggerAttackRelease(frequency, duration);
   };
+  
+  const playChord = async (frequencies: number[], duration: string = '2n') => {
+    await Tone.start();
+    synthRef.current?.triggerAttackRelease(frequencies, duration);
+  };
 
   const playInterval = async (baseFreq: number, semitones: number) => {
     await Tone.start();
@@ -57,5 +62,5 @@ export const useAudioContext = () => {
     }
   };
 
-  return { playNote, playInterval, playFrequencyBoost, volume, setVolume };
+  return { playNote,playChord, playInterval, playFrequencyBoost, volume, setVolume };
 };

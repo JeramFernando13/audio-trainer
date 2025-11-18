@@ -1,0 +1,11 @@
+import { createContext } from 'react';
+
+export type Theme = 'light' | 'dark' | 'system';
+
+export interface ThemeContextType {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  effectiveTheme: 'light' | 'dark'; // Il tema effettivo applicato
+}
+
+export const ThemeContext = createContext<ThemeContextType | null>(null);

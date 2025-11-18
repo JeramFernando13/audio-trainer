@@ -1,4 +1,4 @@
-# 🎵 Audio Trainer
+# <Music /> Audio Trainer
 
 **Live Demo:** [https://audio-trainer.vercel.app/](https://audio-trainer.vercel.app/)
 
@@ -6,7 +6,7 @@ Un'app web interattiva per allenare l'orecchio musicale, pensata sia per musicis
 
 ## 🎯 Caratteristiche
 
-### 🎵 Per Musicisti
+### <Music /> Per Musicisti
 
 - **Intervalli**: Impara e riconosci tutti gli intervalli musicali (unisono, terza maggiore, quinta giusta, ecc.)
 - **Accordi**: Esplora triadi e quadriadi (maggiore, minore, 7th, maj7, ecc.)
