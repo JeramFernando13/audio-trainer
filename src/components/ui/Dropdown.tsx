@@ -4,16 +4,16 @@ import { Link } from 'react-router-dom';
 interface DropdownItem {
   path: string;
   label: string;
-  icon?: string;
+  icon?: React.ElementType; // <-- Cambiato
 }
 
 interface DropdownProps {
   label: string;
-  icon?: string;
+  icon?: React.ElementType; // <-- Cambiato
   items: DropdownItem[];
 }
 
-export const Dropdown = ({ label, icon, items }: DropdownProps) => {
+export const Dropdown = ({ label, icon: Icon, items }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -34,7 +34,7 @@ export const Dropdown = ({ label, icon, items }: DropdownProps) => {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
       >
-        {icon && <span>{icon}</span>}
+        {Icon && <Icon className="w-5 h-5" />} {/* <-- Render icona */}
         {label}
         <svg
           className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -55,7 +55,7 @@ export const Dropdown = ({ label, icon, items }: DropdownProps) => {
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
             >
-              {item.icon && <span>{item.icon}</span>}
+              {item.icon && <item.icon className="w-4 h-4" />} {/* <-- Render icona item */}
               {item.label}
             </Link>
           ))}

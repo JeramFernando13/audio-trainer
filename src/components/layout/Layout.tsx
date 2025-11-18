@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAudio } from '../../hooks/useAudio';
 // import { ThemeToggle } from '../theme/ThemeToggle';
 import { Dropdown } from '../ui/Dropdown';
-import { Music } from 'lucide-react';
+import { AudioLines, Music, Piano, Sliders, Volume2, GraduationCap, Target } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -13,14 +13,14 @@ export const Layout = ({ children }: LayoutProps) => {
   const { volume, setVolume } = useAudio();
 
   const learnItems = [
-    { path: '/learn/frequency', label: 'Frequenze', icon: '🎚️' },
-    { path: '/learn/intervals', label: 'Intervalli', icon: '<Music />' },
-    { path: '/learn/chords', label: 'Accordi', icon: '🎹' },
+    { path: '/learn/frequency', label: 'Frequenze', icon: Sliders },
+    { path: '/learn/intervals', label: 'Intervalli', icon: Music },
+    { path: '/learn/chords', label: 'Accordi', icon: Piano },
   ];
 
   const trainItems = [
-    { path: '/train/frequency', label: 'Frequency Quiz', icon: '🎚️' },
-    { path: '/train/intervals', label: 'Interval Quiz', icon: '<Music />' },
+    { path: '/train/frequency', label: 'Frequency Quiz', icon: Sliders },
+    { path: '/train/intervals', label: 'Interval Quiz', icon: Music },
   ];
 
   const volumePercent = Math.round(((volume + 40) / 40) * 100);
@@ -32,7 +32,7 @@ export const Layout = ({ children }: LayoutProps) => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group">
-              <span className="text-2xl"><Music /></span>
+              <AudioLines className="w-6 h-6" />
               <h1 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
                 Audio Trainer
               </h1>
@@ -40,15 +40,15 @@ export const Layout = ({ children }: LayoutProps) => {
             
             {/* Navigation Dropdowns */}
             <div className="flex items-center gap-2">
-              <Dropdown label="Learn" icon="🎓" items={learnItems} />
-              <Dropdown label="Train" icon="🎯" items={trainItems} />
+              <Dropdown label="Learn" icon={GraduationCap} items={learnItems} />
+              <Dropdown label="Train" icon={Target} items={trainItems} />
             </div>
 
             {/* Controls */}
             <div className="flex items-center gap-4">
               {/* Volume Control */}
               <div className="hidden md:flex items-center gap-3 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
-                <span className="text-sm">🔊</span>
+                <Volume2 className="w-4 h-4" />
                 <input
                   type="range"
                   min="-40"
