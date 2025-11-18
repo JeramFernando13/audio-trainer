@@ -47,7 +47,7 @@ export const Dropdown = ({ label, icon: Icon, items }: DropdownProps) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50 max-h-[calc(100vh-8rem)] overflow-y-auto">
+         <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50 max-h-[calc(100vh-8rem)] overflow-y-auto">
           {items.map((item) => (
             <Link
               key={item.path}

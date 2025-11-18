@@ -5,6 +5,8 @@ import { useAudio } from '../../hooks/useAudio';
 import { Dropdown } from '../ui/Dropdown';
 import { AudioLines, Music, Piano, Sliders, Volume2, GraduationCap, Target } from 'lucide-react';
 
+import { Footer } from './Footer';
+
 interface LayoutProps {
   children: ReactNode;
 }
@@ -72,6 +74,7 @@ export const Layout = ({ children }: LayoutProps) => {
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {children}
       </main>
+      <Footer />
     </div>
   );
 };
