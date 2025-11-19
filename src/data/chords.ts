@@ -1,3 +1,143 @@
+// Root notes with frequencies
+export const ROOT_NOTES = [
+  { name: 'C', freq: 261.63 },
+  { name: 'C#/Db', freq: 277.18 },
+  { name: 'D', freq: 293.66 },
+  { name: 'D#/Eb', freq: 311.13 },
+  { name: 'E', freq: 329.63 },
+  { name: 'F', freq: 349.23 },
+  { name: 'F#/Gb', freq: 369.99 },
+  { name: 'G', freq: 392.00 },
+  { name: 'G#/Ab', freq: 415.30 },
+  { name: 'A', freq: 440.00 },
+  { name: 'A#/Bb', freq: 466.16 },
+  { name: 'B', freq: 493.88 },
+] as const;
+
+export type RootNote = typeof ROOT_NOTES[number];
+
+// Simplified roots for training (short names)
+export interface Root {
+  freq: number;
+  name: string;
+  nameFull: string;
+}
+
+export const ROOTS: Root[] = [
+  { freq: 261.63, name: 'C', nameFull: 'Do' },
+  { freq: 277.18, name: 'C#', nameFull: 'Do#' },
+  { freq: 293.66, name: 'D', nameFull: 'Re' },
+  { freq: 311.13, name: 'D#', nameFull: 'Re#' },
+  { freq: 329.63, name: 'E', nameFull: 'Mi' },
+  { freq: 349.23, name: 'F', nameFull: 'Fa' },
+  { freq: 369.99, name: 'F#', nameFull: 'Fa#' },
+  { freq: 392.00, name: 'G', nameFull: 'Sol' },
+  { freq: 415.30, name: 'G#', nameFull: 'Sol#' },
+  { freq: 440.00, name: 'A', nameFull: 'La' },
+  { freq: 466.16, name: 'A#', nameFull: 'La#' },
+  { freq: 493.88, name: 'B', nameFull: 'Si' },
+];
+
+// Chord Types for Training (simplified structure)
+export interface ChordType {
+  name: string;
+  intervals: number[];
+  symbol: string;
+  category: 'triad' | 'seventh' | 'extended' | 'suspended';
+}
+
+export const CHORD_TYPES: Record<string, ChordType> = {
+  major: { 
+    name: 'Maggiore', 
+    intervals: [0, 4, 7], 
+    symbol: '', 
+    category: 'triad' 
+  },
+  minor: { 
+    name: 'Minore', 
+    intervals: [0, 3, 7], 
+    symbol: 'm', 
+    category: 'triad' 
+  },
+  diminished: { 
+    name: 'Diminuito', 
+    intervals: [0, 3, 6], 
+    symbol: 'dim', 
+    category: 'triad' 
+  },
+  augmented: { 
+    name: 'Aumentato', 
+    intervals: [0, 4, 8], 
+    symbol: 'aug', 
+    category: 'triad' 
+  },
+  maj7: { 
+    name: 'Settima Maggiore', 
+    intervals: [0, 4, 7, 11], 
+    symbol: 'maj7', 
+    category: 'seventh' 
+  },
+  dom7: { 
+    name: 'Settima Dominante', 
+    intervals: [0, 4, 7, 10], 
+    symbol: '7', 
+    category: 'seventh' 
+  },
+  min7: { 
+    name: 'Settima Minore', 
+    intervals: [0, 3, 7, 10], 
+    symbol: 'm7', 
+    category: 'seventh' 
+  },
+  m7b5: { 
+    name: 'Semi-diminuito', 
+    intervals: [0, 3, 6, 10], 
+    symbol: 'm7♭5', 
+    category: 'seventh' 
+  },
+  sus2: { 
+    name: 'Sospeso 2', 
+    intervals: [0, 2, 7], 
+    symbol: 'sus2', 
+    category: 'suspended' 
+  },
+  sus4: { 
+    name: 'Sospeso 4', 
+    intervals: [0, 5, 7], 
+    symbol: 'sus4', 
+    category: 'suspended' 
+  },
+  add9: { 
+    name: 'Add 9', 
+    intervals: [0, 4, 7, 14], 
+    symbol: 'add9', 
+    category: 'extended' 
+  },
+  ninth: { 
+    name: 'Nona', 
+    intervals: [0, 4, 7, 10, 14], 
+    symbol: '9', 
+    category: 'extended' 
+  },
+};
+
+// Helper to get chord types by category
+export const getChordsByCategory = (category: ChordType['category']) => {
+  return Object.entries(CHORD_TYPES)
+    .filter(([, chord]) => chord.category === category)
+    .map(([key, chord]) => ({ key, ...chord }));
+};
+
+// Helper functions
+export const getTriads = () => getChordsByCategory('triad');
+export const getSevenths = () => getChordsByCategory('seventh');
+export const getSuspended = () => getChordsByCategory('suspended');
+export const getExtended = () => getChordsByCategory('extended');
+
+// ============================================
+// CHORDS GUIDE (for ChordsLearn component)
+// ============================================
+
 export const CHORDS_GUIDE = [
   // TRIADI
   {

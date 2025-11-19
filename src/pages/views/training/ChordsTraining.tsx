@@ -4,11 +4,11 @@ import { useAudio } from '../../../hooks/useAudio';
 import { useStats } from '../../../hooks/useStats';
 import { DifficultySelector } from '../../../components/ui/DifficultySelector';
 import { StatsPanel } from '../../../components/ui/StatsPanel';
-import { INTERVALS } from '../../../data/intervals';
-import { INTERVAL_DIFFICULTY_CONFIG, type Difficulty } from '../../../data/difficulty';
+import { CHORD_TYPES, ROOTS, type Root } from '../../../data/chords';
+import { CHORDS_DIFFICULTY_CONFIG, type Difficulty } from '../../../data/difficulty';
 
-export const IntervalTraining = () => {
-  const { playInterval } = useAudio();
+export const ChordsTraining = () => {
+  const { playChord } = useAudio();
   const {
     currentStreak,
     recordAnswer,
@@ -18,23 +18,25 @@ export const IntervalTraining = () => {
   } = useStats();
 
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
-  const [currentIntervalIndex, setCurrentIntervalIndex] = useState<number | null>(null);
+  const [currentChordIndex, setCurrentChordIndex] = useState<number | null>(null);
+  const [currentRoot, setCurrentRoot] = useState<Root | null>(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [feedback, setFeedback] = useState<string>('');
   const [showAnswer, setShowAnswer] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
-  const config = INTERVAL_DIFFICULTY_CONFIG[difficulty];
-  const availableIntervals = config.intervalIndices.map(i => INTERVALS[i]);
-  const savedStats = getStats('intervals', difficulty);
+  const config = CHORDS_DIFFICULTY_CONFIG[difficulty];
+  const availableChords = config.chordTypes.map(type => CHORD_TYPES[type]);
+  const savedStats = getStats('chords', difficulty);
 
   const handleTimeout = useCallback(() => {
-    if (currentIntervalIndex === null) return;
+    if (currentChordIndex === null) return;
     setScore((prev) => ({ ...prev, total: prev.total + 1 }));
-    recordAnswer('intervals', difficulty, false);
-    setFeedback(`⏰ Tempo scaduto! Era: ${availableIntervals[currentIntervalIndex].name}`);
+    recordAnswer('chords', difficulty, false);
+    const rootInfo = currentRoot ? ` (${currentRoot.name}${availableChords[currentChordIndex].symbol})` : ` (${availableChords[currentChordIndex].symbol || 'Major'})`;
+    setFeedback(`⏰ Tempo scaduto! Era: ${availableChords[currentChordIndex].name}${rootInfo}`);
     setShowAnswer(true);
-  }, [currentIntervalIndex, availableIntervals, recordAnswer, difficulty]);
+  }, [currentChordIndex, currentRoot, availableChords, recordAnswer, difficulty]);
 
   // Timer logic
   useEffect(() => {
@@ -53,46 +55,74 @@ export const IntervalTraining = () => {
     return () => clearInterval(timer);
   }, [timeLeft, showAnswer, handleTimeout]);
 
-  const generateNewInterval = () => {
-    const randomIndex = Math.floor(Math.random() * availableIntervals.length);
-    setCurrentIntervalIndex(randomIndex);
+  const generateNewChord = () => {
+    const randomIndex = Math.floor(Math.random() * availableChords.length);
+    const chord = availableChords[randomIndex];
+    
+    // Select root based on difficulty
+    const root = config.randomRoot 
+      ? ROOTS[Math.floor(Math.random() * ROOTS.length)]
+      : ROOTS[0]; // C
+    
+    setCurrentChordIndex(randomIndex);
+    setCurrentRoot(root);
     setFeedback('');
     setShowAnswer(false);
     setTimeLeft(config.timeLimit);
-    playInterval(261.63, availableIntervals[randomIndex].semitones);
+
+    // Generate frequencies from intervals using selected root
+    // Use root freq + intervals for playChord
+
+    // Decide play mode
+    let playMode = config.playMode;
+    if (playMode === 'mixed') {
+      playMode = Math.random() > 0.5 ? 'arpeggio' : 'block';
+    }
+
+    // Play chord with correct signature
+    playChord(root.freq, chord.intervals, playMode as 'arpeggio' | 'block');
   };
 
   const handleGuess = (index: number) => {
-    if (currentIntervalIndex === null || showAnswer) return;
+    if (currentChordIndex === null || showAnswer) return;
 
-    const isCorrect = index === currentIntervalIndex;
+    const isCorrect = index === currentChordIndex;
     setScore((prev) => ({
       correct: prev.correct + (isCorrect ? 1 : 0),
       total: prev.total + 1,
     }));
 
-    // Record in persistent stats
-    recordAnswer('intervals', difficulty, isCorrect);
+    recordAnswer('chords', difficulty, isCorrect);
 
     if (isCorrect) {
       setFeedback('✅ Corretto!');
     } else {
+      const rootInfo = currentRoot ? ` (${currentRoot.name}${availableChords[currentChordIndex].symbol})` : ` (${availableChords[currentChordIndex].symbol || 'Major'})`;
       setFeedback(
-        `❌ Sbagliato! Era: ${availableIntervals[currentIntervalIndex].name}`
+        `❌ Sbagliato! Era: ${availableChords[currentChordIndex].name}${rootInfo}`
       );
     }
     setShowAnswer(true);
     setTimeLeft(null);
   };
 
-  const repeatInterval = () => {
-    if (currentIntervalIndex === null) return;
-    playInterval(261.63, availableIntervals[currentIntervalIndex].semitones);
+  const repeatChord = () => {
+    if (currentChordIndex === null || !currentRoot) return;
+    const chord = availableChords[currentChordIndex];
+
+    let playMode = config.playMode;
+    if (playMode === 'mixed') {
+      playMode = Math.random() > 0.5 ? 'arpeggio' : 'block';
+    }
+
+    // Play chord with correct signature
+    playChord(currentRoot.freq, chord.intervals, playMode as 'arpeggio' | 'block');
   };
 
   const resetScore = () => {
     setScore({ correct: 0, total: 0 });
-    setCurrentIntervalIndex(null);
+    setCurrentChordIndex(null);
+    setCurrentRoot(null);
     setFeedback('');
     setShowAnswer(false);
     setTimeLeft(null);
@@ -112,10 +142,10 @@ export const IntervalTraining = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Interval Training
+            Chords Training
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Riconosci l'intervallo musicale
+            Riconosci il tipo di accordo
           </p>
         </div>
 
@@ -130,12 +160,12 @@ export const IntervalTraining = () => {
         {/* Stats Panel */}
         <div className="mb-6">
           <StatsPanel
-            quizType="intervals"
+            quizType="chords"
             currentCorrect={score.correct}
             currentTotal={score.total}
             currentStreak={currentStreak}
             bestStreak={savedStats.bestStreak}
-            overallAccuracy={getOverallAccuracy('intervals')}
+            overallAccuracy={getOverallAccuracy('chords')}
             lastPlayed={savedStats.lastPlayed}
           />
         </div>
@@ -175,16 +205,16 @@ export const IntervalTraining = () => {
         {/* Controls */}
         <div className="flex gap-4 mb-6">
           <button
-            onClick={generateNewInterval}
+            onClick={generateNewChord}
             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg"
           >
             <Play className="w-5 h-5" />
-            {currentIntervalIndex === null ? 'Start Quiz' : 'Next Question'}
+            {currentChordIndex === null ? 'Start Quiz' : 'Next Question'}
           </button>
 
-          {currentIntervalIndex !== null && (
+          {currentChordIndex !== null && (
             <button
-              onClick={repeatInterval}
+              onClick={repeatChord}
               className="bg-gray-600 hover:bg-gray-700 text-white py-4 px-6 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg"
             >
               <Volume2 className="w-5 h-5" />
@@ -215,15 +245,15 @@ export const IntervalTraining = () => {
         )}
 
         {/* Options */}
-        {currentIntervalIndex !== null && (
+        {currentChordIndex !== null && (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {availableIntervals.map((interval, index) => (
+            {availableChords.map((chord, index) => (
               <button
                 key={index}
                 onClick={() => handleGuess(index)}
                 disabled={showAnswer}
                 className={`p-4 rounded-xl font-semibold transition border-2 ${
-                  showAnswer && index === currentIntervalIndex
+                  showAnswer && index === currentChordIndex
                     ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-500'
                     : showAnswer
                     ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-300 dark:border-gray-600 cursor-not-allowed'
@@ -231,11 +261,11 @@ export const IntervalTraining = () => {
                 }`}
               >
                 <div className="text-sm">
-                  {config.showIntervalName ? interval.name : `Intervallo ${index + 1}`}
+                  {config.showChordName ? chord.name : `Accordo ${index + 1}`}
                 </div>
-                {config.showIntervalName && (
+                {config.showChordName && (
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {interval.semitones === 0 ? 'Stesso suono' : `${interval.semitones} semitoni`}
+                    {currentRoot ? `${currentRoot.name}${chord.symbol}` : `C${chord.symbol}`}
                   </div>
                 )}
               </button>
@@ -244,17 +274,17 @@ export const IntervalTraining = () => {
         )}
 
         {/* Tips */}
-        {currentIntervalIndex === null && (
+        {currentChordIndex === null && (
           <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl">
             <div className="flex items-start gap-3">
               <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-1 shrink-0" />
               <div className="text-sm text-gray-700 dark:text-gray-300">
                 <strong className="block mb-2">Tips per progredire:</strong>
                 <ul className="space-y-1 list-disc list-inside">
-                  <li><strong>Easy:</strong> Inizia con intervalli consonanti e facili da riconoscere</li>
-                  <li><strong>Medium:</strong> Aggiungi seconde e seste maggiori</li>
-                  <li><strong>Hard:</strong> Include intervalli dissonanti (2m, 7m, tritono)</li>
-                  <li><strong>Pro:</strong> Blind mode - tutti i 13 semitoni, solo dall'ascolto</li>
+                  <li><strong>Easy:</strong> Distingui maggiore (allegro) da minore (triste)</li>
+                  <li><strong>Medium:</strong> Impara diminuito (teso), aumentato (sospeso), sus (aperto)</li>
+                  <li><strong>Hard:</strong> Riconosci le settime (maj7 dolce, 7 blues, m7 jazz, m7♭5 teso)</li>
+                  <li><strong>Pro:</strong> Blind mode - tutti gli accordi, arpeggio e blocco misti</li>
                 </ul>
               </div>
             </div>

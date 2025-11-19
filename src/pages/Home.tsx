@@ -51,6 +51,7 @@ export const Home = () => {
     },
   ];
 
+
   return (
     <div className="space-y-12 pb-12">
       {/* Hero Section */}

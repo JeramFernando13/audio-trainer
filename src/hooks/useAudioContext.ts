@@ -33,17 +33,17 @@ export const useAudioContext = () => {
   }, [volume]);
 
   const playNote = async (frequency: number, duration: string = '8n') => {
-    await Tone.start();
+    await Tone.start(); // Auto-start on first interaction
     synthRef.current?.triggerAttackRelease(frequency, duration);
   };
   
   const playChord = async (frequencies: number[], duration: string = '2n') => {
-    await Tone.start();
+    await Tone.start(); // Auto-start on first interaction
     synthRef.current?.triggerAttackRelease(frequencies, duration);
   };
 
   const playInterval = async (baseFreq: number, semitones: number) => {
-    await Tone.start();
+    await Tone.start(); // Auto-start on first interaction
     const secondFreq = baseFreq * Math.pow(2, semitones / 12);
     synthRef.current?.triggerAttackRelease(baseFreq, '4n');
     setTimeout(() => {
@@ -51,8 +51,8 @@ export const useAudioContext = () => {
     }, 600);
   };
 
-  const playFrequencyBoost = async (frequency: number) => {
-    await Tone.start();
+  const playFrequencyBoosted = async (frequency: number) => {
+    await Tone.start(); // Auto-start on first interaction
     if (filterRef.current && noiseRef.current) {
       filterRef.current.frequency.value = frequency;
       noiseRef.current.start();
@@ -62,5 +62,5 @@ export const useAudioContext = () => {
     }
   };
 
-  return { playNote,playChord, playInterval, playFrequencyBoost, volume, setVolume };
+  return { playNote, playChord, playInterval, playFrequencyBoosted, volume, setVolume };
 };

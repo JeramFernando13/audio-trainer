@@ -4,14 +4,14 @@ import { FREQUENCY_GUIDE } from '../../../data/frequencies';
 import { Sliders, AlertTriangle, RotateCcw, TrendingUp, TrendingDown, Guitar, Lightbulb } from 'lucide-react';
 
 export const FrequencyLearn = () => {
-  const { playFrequencyBoost } = useAudio();
+  const { playFrequencyBoosted } = useAudio();
   const [selectedBand, setSelectedBand] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const playBand = async (index: number) => {
     setSelectedBand(index);
     setIsPlaying(true);
-    await playFrequencyBoost(FREQUENCY_GUIDE[index].freq);
+    await playFrequencyBoosted(FREQUENCY_GUIDE[index].freq);
     setTimeout(() => setIsPlaying(false), 2000);
   };
 
