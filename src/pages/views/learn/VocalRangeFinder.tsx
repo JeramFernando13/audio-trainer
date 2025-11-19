@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from 'react';
-import { Mic, Save, TrendingUp, TrendingDown, Award, Music, MicVocal } from 'lucide-react';
+import { Mic, Save, TrendingUp, TrendingDown, Award, MicVocal } from 'lucide-react';
 import { usePitchDetection } from '../../../hooks/usePitchDetection';
 
 interface VoiceType {
