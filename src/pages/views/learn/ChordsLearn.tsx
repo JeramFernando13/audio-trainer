@@ -23,7 +23,7 @@ export const ChordsLearn = () => {
       const frequencies = chord.intervals.map(
         semitones => baseFreq * Math.pow(2, semitones / 12)
       );
-      playChord(frequencies, '2n');
+      playChord(baseFreq, frequencies, 'block');
       setTimeout(() => setIsPlaying(false), 1500);
     } else {
       chord.intervals.forEach((semitones, i) => {

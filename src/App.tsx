@@ -6,7 +6,7 @@ import { Home } from './pages/Home';
 
 // Learn Pages
 import { FrequencyLearn } from './pages/views/learn/FrequencyLearn';
-import { SineWaveLearn } from './pages/views/learn/SinewaveLearn';
+import { SineWaveLearn } from './pages/views/learn/SineWaveLearn';
 import { IntervalsLearn } from './pages/views/learn/IntervalLearn';
 import { ChordsLearn } from './pages/views/learn/ChordsLearn';
 import { VocalLearn } from './pages/views/learn/VocalLearn';
