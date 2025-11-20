@@ -18,6 +18,9 @@ import { SineWaveTraining } from './pages/views/training/SineWaveTraining';
 import { IntervalTraining } from './pages/views/training/IntervalTraining';
 import { ChordsTraining } from './pages/views/training/ChordsTraining';
 import { VocalTraining } from './pages/views/training/VocalTraining';
+import { Musicians } from './pages/categories/Musicians';
+import { Singers } from './pages/categories/Singers';
+import { SoundEngineers } from './pages/categories/SoundEngineers';
 
 function App() {
   return (
@@ -28,6 +31,11 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               
+              {/* Category Pages */}
+              <Route path="/musicians" element={<Musicians />} />
+              <Route path="/sound-engineers" element={<SoundEngineers />} />
+              <Route path="/singers" element={<Singers />} />
+
               {/* Learn Routes - Organized by category */}
               <Route path="/learn/frequency" element={<FrequencyLearn />} />
               <Route path="/learn/sine-wave" element={<SineWaveLearn />} />

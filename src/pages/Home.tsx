@@ -1,54 +1,39 @@
 import { Link } from 'react-router-dom';
-import { Sliders, Music, Piano, Target, GraduationCap, Check, BarChart3, RotateCcw, Lightbulb } from 'lucide-react';
+import { Sliders, Music, Piano, Target, GraduationCap, Check, BarChart3, RotateCcw, Lightbulb, AudioWaveform, MicVocal } from 'lucide-react';
 
 export const Home = () => {
   const learnSections = [
     {
-      title: 'Frequenze & EQ',
+      title: 'Sound Engineers',
       description: 'Impara a riconoscere le bande di frequenza e come influenzano il suono.',
-      icon: Sliders,
-      path: '/learn/frequency',
-      color: 'from-purple-500 to-purple-600',
-      features: ['Vocali di riferimento', 'Mix tips pratici', 'Descrizioni dettagliate'],
+      icon: AudioWaveform,
+      path: '/sound-engineers',
+      color: 'from-purple-500 to-violet-600',
+      features: ['Frequenze (Pink Noise)', 'Sine Wave Theory'],
       tag: 'Sound Engineers',
     },
     {
-      title: 'Intervalli Musicali',
-      description: 'Scopri tutti gli intervalli con canzoni famose come riferimento mnemonico.',
+      title: 'Musicians',
+      description: 'Esplora intervalli e accordi con esempi pratici e teoria musicale.',
       icon: Music,
-      path: '/learn/intervals',
-      color: 'from-blue-500 to-blue-600',
-      features: ['13 intervalli completi', 'Riferimenti canzoni', 'Teoria + pratica'],
+      path: '/musicians',
+      color: 'from-blue-500 to-indigo-600',
+      features: ['Intervalli Musicali', 'Accordi'],
       tag: 'Musicisti',
     },
     {
-      title: 'Accordi',
-      description: 'Esplora triadi e quadriadi, dal maggiore ai settime avanzati.',
-      icon: Piano,
-      path: '/learn/chords',
-      color: 'from-indigo-500 to-indigo-600',
-      features: ['Triadi e quadriadi', 'Modalità arpeggio', 'Tutte le tonalità'],
-      tag: 'Musicisti',
+      title: 'Singers',
+      description: 'Allena la tua voce con esercizi di teoria vocale e test del range.',
+      icon: MicVocal,
+      path: '/singers',
+      color: 'from-green-500 to-emerald-600',
+      features: ['Teoria Vocale', 'Trova il tuo Range'],
+      tag: 'Cantanti',
     },
   ];
 
   const trainSections = [
-    {
-      title: 'Frequency Quiz',
-      description: 'Metti alla prova la tua capacità di identificare frequenze boostato su pink noise.',
-      icon: Sliders,
-      path: '/train/frequency',
-      color: 'from-orange-500 to-orange-600',
-      difficulty: 'Medio',
-    },
-    {
-      title: 'Interval Quiz',
-      description: 'Riconosci gli intervalli ascendenti partendo da qualsiasi nota.',
-      icon: Music,
-      path: '/train/intervals',
-      color: 'from-green-500 to-green-600',
-      difficulty: 'Base',
-    },
+    {}
   ];
 
 
@@ -73,6 +58,10 @@ export const Home = () => {
           <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
             <Music className="w-4 h-4" />
             Per Musicisti
+          </div>
+           <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
+            <MicVocal className="w-4 h-4" />
+            Per Cantanti
           </div>
         </div>
       </div>
@@ -138,70 +127,7 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* Train Section */}
-      <section className="space-y-6">
-        <div className="flex items-center gap-3">
-          <Target className="w-8 h-8 text-gray-900 dark:text-white" />
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Allenati</h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Quiz interattivi con punteggio e progressione
-            </p>
-          </div>
-        </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {trainSections.map((section) => {
-            const Icon = section.icon;
-            return (
-              <Link
-                key={section.path}
-                to={section.path}
-                className="group relative bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300 hover:scale-[1.02]"
-              >
-                {/* Gradient Side Bar */}
-                <div className={`absolute left-0 top-0 bottom-0 w-2 bg-linear-to-b ${section.color}`} />
-
-                <div className="p-6 space-y-4 pl-8">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <Icon className="w-10 h-10 text-gray-700 dark:text-gray-300" strokeWidth={1.5} />
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
-                          {section.title}
-                        </h3>
-                        <span className="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 px-2 py-1 rounded-full">
-                          Difficoltà: {section.difficulty}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <p className="text-gray-600 dark:text-gray-400">
-                    {section.description}
-                  </p>
-
-                  <div className="flex items-center gap-4 pt-2">
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      <BarChart3 className="w-4 h-4" />
-                      Statistiche in tempo reale
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      <RotateCcw className="w-4 h-4" />
-                      Feedback immediato
-                    </div>
-                  </div>
-
-                  <div className="pt-2 flex items-center text-blue-600 dark:text-blue-400 font-medium text-sm group-hover:gap-2 transition-all">
-                    Inizia il quiz
-                    <span className="group-hover:translate-x-1 transition-transform">→</span>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
 
       {/* Info Box */}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
