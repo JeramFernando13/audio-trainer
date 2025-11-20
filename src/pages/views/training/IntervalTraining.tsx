@@ -59,7 +59,7 @@ export const IntervalTraining = () => {
     setFeedback('');
     setShowAnswer(false);
     setTimeLeft(config.timeLimit);
-    playInterval(261.63, availableIntervals[randomIndex].semitones);
+    playInterval(261.63, availableIntervals[randomIndex].semitones, 'melodic');
   };
 
   const handleGuess = (index: number) => {
@@ -87,7 +87,7 @@ export const IntervalTraining = () => {
 
   const repeatInterval = () => {
     if (currentIntervalIndex === null) return;
-    playInterval(261.63, availableIntervals[currentIntervalIndex].semitones);
+    playInterval(261.63, availableIntervals[currentIntervalIndex].semitones, 'melodic');
   };
 
   const resetScore = () => {

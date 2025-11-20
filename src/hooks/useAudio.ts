@@ -30,7 +30,10 @@ export const useAudio = () => {
     } else {
       // Play notes in sequence
       synth.triggerAttackRelease(baseFreq, '4n', Tone.now());
-      synth.triggerAttackRelease(secondFreq, '4n', Tone.now() + 0.5);
+      setTimeout(() => {
+        const synth2 = new Tone.Synth().toDestination();
+        synth2.triggerAttackRelease(secondFreq, '4n');
+      }, 500);
     }
   }, [applyVolume]);
 
@@ -44,11 +47,13 @@ export const useAudio = () => {
     const frequencies = intervals.map(interval => rootFreq * Math.pow(2, interval / 12));
 
     if (mode === 'block') {
-      // Play all notes together
-      frequencies.forEach(freq => {
-        const synth = new Tone.Synth().toDestination();
-        synth.triggerAttackRelease(freq, '1n');
-      });
+      // FIXED: Use PolySynth for perfect sync
+      const polySynth = new Tone.PolySynth(Tone.Synth).toDestination();
+      polySynth.triggerAttackRelease(frequencies, '1n');
+      
+      setTimeout(() => {
+        polySynth.dispose();
+      }, 2000);
     } else {
       // Play notes in sequence (arpeggio)
       frequencies.forEach((freq, index) => {

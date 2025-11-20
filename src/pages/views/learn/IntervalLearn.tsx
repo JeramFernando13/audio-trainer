@@ -14,7 +14,7 @@ export const IntervalsLearn = () => {
     setSelectedInterval(index);
     setIsPlaying(true);
     const baseFreq = ROOT_NOTES[rootNote].freq;
-    await playInterval(baseFreq, INTERVALS_GUIDE[index].semitones);
+    await playInterval(baseFreq, INTERVALS_GUIDE[index].semitones, 'melodic');
     setTimeout(() => setIsPlaying(false), 1500);
   };
 

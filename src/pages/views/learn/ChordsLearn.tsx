@@ -19,11 +19,8 @@ export const ChordsLearn = () => {
     const baseFreq = ROOT_NOTES[rootNote].freq;
     const chord = CHORDS_GUIDE[index];
     
-    if (playMode === 'block') {
-      const frequencies = chord.intervals.map(
-        semitones => baseFreq * Math.pow(2, semitones / 12)
-      );
-      playChord(baseFreq, frequencies, 'block');
+   if (playMode === 'block') {
+      playChord(baseFreq, [...chord.intervals], 'block');
       setTimeout(() => setIsPlaying(false), 1500);
     } else {
       chord.intervals.forEach((semitones, i) => {
