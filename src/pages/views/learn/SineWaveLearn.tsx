@@ -304,7 +304,205 @@ export const SineWaveLearn = () => {
         </h2>
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border-2 border-gray-200 dark:border-gray-700">
           {/* Frequency Selector */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              Seleziona Frequenza: {compareFreq} Hz
+            </label>
+            <input
+              type="range"
+              min="20"
+              max="20000"
+              step="10"
+              value={compareFreq}
+              onChange={(e) => setCompareFreq(Number(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+            />
+            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <span>20 Hz (Sub Bass)</span>
+              <span>1 kHz (Reference)</span>
+              <span>20 kHz (Upper Limit)</span>
+            </div>
+          </div> */}
+
+          {/* Free Practice Section - NEW */}
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+              <Target className="w-6 h-6" />
+              Pratica Libera: Esplora Frequenze
+            </h2>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border-2 border-gray-200 dark:border-gray-700">
+              {/* Manual Input */}
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Inserisci Frequenza Manuale (20-20000 Hz)
+                </label>
+                <div className="flex gap-3">
+                  <input
+                    type="number"
+                    min="20"
+                    max="20000"
+                    placeholder="es: 1247"
+                    className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        const freq = Number((e.target as HTMLInputElement).value);
+                        if (freq >= 20 && freq <= 20000) {
+                          setIsPlaying('sine');
+                          playSineWave(freq, 2);
+                          setTimeout(() => setIsPlaying(null), 2000);
+                        }
+                      }
+                    }}
+                    id="manualFreqInput"
+                  />
+                  <button
+                    onClick={() => {
+                      const input = document.getElementById('manualFreqInput') as HTMLInputElement;
+                      const freq = Number(input.value);
+                      if (freq >= 20 && freq <= 20000) {
+                        setIsPlaying('sine');
+                        playSineWave(freq, 2);
+                        setTimeout(() => setIsPlaying(null), 2000);
+                      } else {
+                        alert('Inserisci una frequenza tra 20 e 20000 Hz');
+                      }
+                    }}
+                    disabled={isPlaying !== null}
+                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-6 py-3 rounded-xl font-semibold transition flex items-center gap-2"
+                  >
+                    <Waves className="w-5 h-5" />
+                    Play
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Premi Enter o clicca Play per ascoltare la frequenza
+                </p>
+              </div>
+
+              {/* Common Frequencies Library */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                  Frequenze Comuni (Click per ascoltare)
+                </label>
+                
+                {/* Critical Frequencies */}
+                <div className="mb-4">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 font-semibold">Frequenze Critiche Audio Pro:</p>
+                  <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+                    {[
+                      { freq: 63, label: '63', color: 'from-red-500 to-red-600', note: 'Room Mode' },
+                      { freq: 100, label: '100', color: 'from-orange-500 to-orange-600', note: 'Kick Fund.' },
+                      { freq: 250, label: '250', color: 'from-yellow-500 to-yellow-600', note: 'Muddy' },
+                      { freq: 500, label: '500', color: 'from-green-500 to-green-600', note: 'Reference' },
+                      { freq: 1000, label: '1k', color: 'from-cyan-500 to-cyan-600', note: 'Standard' },
+                      { freq: 2000, label: '2k', color: 'from-blue-500 to-blue-600', note: 'Presence' },
+                      { freq: 4000, label: '4k', color: 'from-purple-500 to-purple-600', note: 'Ear Peak' },
+                      { freq: 8000, label: '8k', color: 'from-pink-500 to-pink-600', note: 'Sibilance' },
+                    ].map((item) => (
+                      <button
+                        key={item.freq}
+                        onClick={() => {
+                          setIsPlaying('sine');
+                          playSineWave(item.freq, 2);
+                          setTimeout(() => setIsPlaying(null), 2000);
+                        }}
+                        disabled={isPlaying !== null}
+                        className={`bg-linear-to-r ${item.color} hover:opacity-90 disabled:opacity-50 text-white p-3 rounded-lg font-bold text-sm transition shadow-md hover:shadow-lg group relative`}
+                      >
+                        <div>{item.label} Hz</div>
+                        <div className="text-xs opacity-90">{item.note}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ISO Standard Octave Bands */}
+                <div className="mb-4">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 font-semibold">Bande Ottava ISO Standard:</p>
+                  <div className="grid grid-cols-5 md:grid-cols-10 gap-2">
+                    {[
+                      { freq: 31.5, label: '31.5' },
+                      { freq: 63, label: '63' },
+                      { freq: 125, label: '125' },
+                      { freq: 250, label: '250' },
+                      { freq: 500, label: '500' },
+                      { freq: 1000, label: '1k' },
+                      { freq: 2000, label: '2k' },
+                      { freq: 4000, label: '4k' },
+                      { freq: 8000, label: '8k' },
+                      { freq: 16000, label: '16k' },
+                    ].map((item) => (
+                      <button
+                        key={item.freq}
+                        onClick={() => {
+                          setIsPlaying('sine');
+                          playSineWave(item.freq, 2);
+                          setTimeout(() => setIsPlaying(null), 2000);
+                        }}
+                        disabled={isPlaying !== null}
+                        className="bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white p-2 rounded-lg font-mono text-xs transition"
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Musical Notes */}
+                <div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 font-semibold">Note Musicali (A440 Standard):</p>
+                  <div className="grid grid-cols-6 md:grid-cols-12 gap-2">
+                    {[
+                      { freq: 110, label: 'A2' },
+                      { freq: 220, label: 'A3' },
+                      { freq: 261.63, label: 'C4' },
+                      { freq: 293.66, label: 'D4' },
+                      { freq: 329.63, label: 'E4' },
+                      { freq: 392, label: 'G4' },
+                      { freq: 440, label: 'A4' },
+                      { freq: 523.25, label: 'C5' },
+                      { freq: 587.33, label: 'D5' },
+                      { freq: 659.25, label: 'E5' },
+                      { freq: 880, label: 'A5' },
+                      { freq: 1046.5, label: 'C6' },
+                    ].map((item) => (
+                      <button
+                        key={item.freq}
+                        onClick={() => {
+                          setIsPlaying('sine');
+                          playSineWave(item.freq, 2);
+                          setTimeout(() => setIsPlaying(null), 2000);
+                        }}
+                        disabled={isPlaying !== null}
+                        className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white p-2 rounded-lg font-mono text-xs transition"
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Tips */}
+              <div className="mt-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
+                <div className="flex gap-3">
+                  <Lightbulb className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0" />
+                  <div>
+                    <p className="font-semibold text-green-800 dark:text-green-300 mb-1">Come allenarsi efficacemente:</p>
+                    <ul className="text-sm text-green-700 dark:text-green-400 space-y-1 list-disc list-inside">
+                      <li>Inizia con le 8 frequenze critiche (63, 100, 250, 500, 1k, 2k, 4k, 8k)</li>
+                      <li>Ascolta ogni frequenza 5-10 volte per memorizzare il "carattere"</li>
+                      <li>Chiudi gli occhi e cerca di immaginare dove si trova nello spettro</li>
+                      <li>Prova l'input manuale per testare frequenze random (es: 1247, 3789)</li>
+                      <li>Quando sei pronto, vai al Training per testare le tue abilità!</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>   
+          {/* Frequency Selector */}
+          <div className="m-6">
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Seleziona Frequenza: {compareFreq} Hz
             </label>

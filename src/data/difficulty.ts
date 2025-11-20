@@ -45,64 +45,77 @@ export interface FrequencyDifficultyConfig {
 export const FREQUENCY_DIFFICULTY_CONFIG: Record<Difficulty, FrequencyDifficultyConfig> = {
   easy: {
     bands: [
-      { freq: 100, name: 'Bass' },
-      { freq: 400, name: 'Low Mids' },
-      { freq: 1000, name: 'Mids' },
-      { freq: 5000, name: 'Presence' }
-    ],
-    timeLimit: null,
-    showFrequency: true,
-    description: '4 bande ben distanziate - Nessun limite di tempo'
-  },
-  medium: {
-    bands: [
-      { freq: 60, name: 'Sub Bass' },
-      { freq: 120, name: 'Bass' },
-      { freq: 400, name: 'Low Mids' },
-      { freq: 1000, name: 'Mids' },
-      { freq: 2500, name: 'Upper Mids' },
-      { freq: 5000, name: 'Presence' },
-      { freq: 8000, name: 'Brilliance' }
-    ],
-    timeLimit: 15,
-    showFrequency: true,
-    description: '7 bande - 15 secondi per rispondere'
-  },
-  hard: {
-    bands: [
-      { freq: 40, name: 'Deep Sub' },
-      { freq: 80, name: 'Sub Bass' },
-      { freq: 200, name: 'Bass' },
-      { freq: 500, name: 'Low Mids' },
-      { freq: 1000, name: 'Mids' },
-      { freq: 2000, name: 'Upper Mids' },
-      { freq: 4000, name: 'Presence' },
-      { freq: 8000, name: 'Brilliance' },
-      { freq: 12000, name: 'Air' }
-    ],
-    timeLimit: 10,
-    showFrequency: true,
-    description: '9 bande - 10 secondi - Range esteso (40Hz-12kHz)'
-  },
-  pro: {
-    bands: [
-      { freq: 20, name: 'Infra Sub' },
-      { freq: 40, name: 'Deep Sub' },
       { freq: 80, name: 'Sub Bass' },
       { freq: 150, name: 'Bass' },
       { freq: 300, name: 'Low Mids' },
       { freq: 600, name: 'Mids' },
       { freq: 1200, name: 'Upper Mids' },
-      { freq: 2500, name: 'High Mids' },
-      { freq: 5000, name: 'Presence' },
-      { freq: 8000, name: 'Brilliance' },
-      { freq: 12000, name: 'Air' },
-      { freq: 16000, name: 'Ultra Air' }
+      { freq: 3000, name: 'Presence' },
+      { freq: 6000, name: 'Brilliance' }
     ],
-    timeLimit: 8,
+    timeLimit: null,
+    showFrequency: true,
+    description: '7 bande - Nessun limite di tempo - Livello base'
+  },
+  medium: {
+    bands: [
+      { freq: 60, name: 'Deep Sub' },
+      { freq: 120, name: 'Sub Bass' },
+      { freq: 250, name: 'Bass' },
+      { freq: 500, name: 'Low Mids' },
+      { freq: 1000, name: 'Mids' },
+      { freq: 2000, name: 'Upper Mids' },
+      { freq: 4000, name: 'Presence' },
+      { freq: 8000, name: 'Brilliance' }
+    ],
+    timeLimit: 12,
+    showFrequency: true,
+    description: '8 bande - 12 secondi - Livello intermedio'
+  },
+  hard: {
+    bands: [
+      { freq: 40, name: 'Sub Deep' },
+      { freq: 60, name: 'Deep Sub' },
+      { freq: 100, name: 'Sub Bass' },
+      { freq: 160, name: 'Bass' },
+      { freq: 250, name: 'Upper Bass' },
+      { freq: 400, name: 'Low Mids' },
+      { freq: 630, name: 'True Mids' },
+      { freq: 1000, name: 'Mids' },
+      { freq: 1600, name: 'Upper Mids' },
+      { freq: 2500, name: 'Presence' },
+      { freq: 5000, name: 'Brilliance' },
+      { freq: 10000, name: 'Air' }
+    ],
+    timeLimit: 10,
+    showFrequency: true,
+    description: '12 bande - 10 secondi - Alta difficoltà (40Hz-10kHz)'
+  },
+  pro: {
+    bands: [
+      { freq: 20, name: 'Infra Sub' },
+      { freq: 32, name: 'Deep Sub' },
+      { freq: 50, name: 'Low Sub' },
+      { freq: 70, name: 'Sub Bass' },
+      { freq: 100, name: 'Punch Bass' },
+      { freq: 160, name: 'Upper Bass' },
+      { freq: 250, name: 'Low Mids' },
+      { freq: 400, name: 'Body Mids' },
+      { freq: 630, name: 'True Mids' },
+      { freq: 1000, name: 'Upper Mids' },
+      { freq: 1600, name: 'High Mids' },
+      { freq: 2500, name: 'Presence' },
+      { freq: 4000, name: 'High Presence' },
+      { freq: 6000, name: 'Brilliance' },
+      { freq: 10000, name: 'Upper Brilliance' },
+      { freq: 14000, name: 'Air' },
+      { freq: 18000, name: 'Ultra Air' }
+    ],
+    timeLimit: 10,
     showFrequency: false,
-    description: '12 bande - 8 secondi - Full spectrum (20Hz-16kHz) - Blind mode'
+    description: '17 bande – 10 secondi – Ultra Full Spectrum (20Hz–18kHz) – Blind Master Mode'
   }
+
 };
 
 // ============================================
