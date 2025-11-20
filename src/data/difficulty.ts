@@ -4,30 +4,25 @@ export type Difficulty = 'easy' | 'medium' | 'hard' | 'pro';
 
 export interface DifficultyMeta {
   label: string;
-  emoji: string;
   color: string;
 }
 
 export const DIFFICULTY_META: Record<Difficulty, DifficultyMeta> = {
   easy: {
     label: 'Easy',
-    emoji: '🟢',
-    color: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700'
+    color: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-300 cdark:border-green-700'
   },
   medium: {
     label: 'Medium',
-    emoji: '🟡',
-    color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700'
+    color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border-yellow-300 cdark:border-yellow-700'
   },
   hard: {
     label: 'Hard',
-    emoji: '🟠',
-    color: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-300 dark:border-orange-700'
+    color: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-300 cdark:border-orange-700'
   },
   pro: {
     label: 'Pro',
-    emoji: '🔴',
-    color: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700'
+    color: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-300 cdark:border-red-700'
   }
 };
 
@@ -57,7 +52,7 @@ export const FREQUENCY_DIFFICULTY_CONFIG: Record<Difficulty, FrequencyDifficulty
     ],
     timeLimit: null,
     showFrequency: true,
-    description: '4 bande ben distanziate • Nessun limite di tempo'
+    description: '4 bande ben distanziate - Nessun limite di tempo'
   },
   medium: {
     bands: [
@@ -71,7 +66,7 @@ export const FREQUENCY_DIFFICULTY_CONFIG: Record<Difficulty, FrequencyDifficulty
     ],
     timeLimit: 15,
     showFrequency: true,
-    description: '7 bande • 15 secondi per rispondere'
+    description: '7 bande - 15 secondi per rispondere'
   },
   hard: {
     bands: [
@@ -87,7 +82,7 @@ export const FREQUENCY_DIFFICULTY_CONFIG: Record<Difficulty, FrequencyDifficulty
     ],
     timeLimit: 10,
     showFrequency: true,
-    description: '9 bande • 10 secondi • Range esteso (40Hz-12kHz)'
+    description: '9 bande - 10 secondi - Range esteso (40Hz-12kHz)'
   },
   pro: {
     bands: [
@@ -106,7 +101,7 @@ export const FREQUENCY_DIFFICULTY_CONFIG: Record<Difficulty, FrequencyDifficulty
     ],
     timeLimit: 8,
     showFrequency: false,
-    description: '12 bande • 8 secondi • Full spectrum (20Hz-16kHz) • Blind mode'
+    description: '12 bande - 8 secondi - Full spectrum (20Hz-16kHz) - Blind mode'
   }
 };
 
@@ -123,28 +118,28 @@ export interface IntervalDifficultyConfig {
 
 export const INTERVAL_DIFFICULTY_CONFIG: Record<Difficulty, IntervalDifficultyConfig> = {
   easy: {
-    intervalIndices: [0, 4, 5, 7, 12], // Unisono, 3M, 4G, 5G, 8va
+    intervalIndices: [0, 4, 5, 7, 12],
     timeLimit: null,
     showIntervalName: true,
-    description: '5 intervalli consonanti • Nessun limite di tempo'
+    description: '5 intervalli consonanti - Nessun limite di tempo'
   },
   medium: {
-    intervalIndices: [0, 2, 4, 5, 7, 9, 12], // + 2M, 6M
+    intervalIndices: [0, 2, 4, 5, 7, 9, 12],
     timeLimit: 15,
     showIntervalName: true,
-    description: '7 intervalli • 15 secondi per rispondere'
+    description: '7 intervalli - 15 secondi per rispondere'
   },
   hard: {
-    intervalIndices: [0, 1, 2, 3, 4, 5, 7, 9, 10, 12], // + semitoni, 7m
+    intervalIndices: [0, 1, 2, 3, 4, 5, 7, 9, 10, 12],
     timeLimit: 10,
     showIntervalName: true,
-    description: '10 intervalli • 10 secondi • Include dissonanze'
+    description: '10 intervalli - 10 secondi - Include dissonanze'
   },
   pro: {
-    intervalIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], // Tutti
+    intervalIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
     timeLimit: 8,
     showIntervalName: false,
-    description: '13 intervalli • 8 secondi • Tutti i semitoni • Blind mode'
+    description: '13 intervalli - 8 secondi - Tutti i semitoni - Blind mode'
   }
 };
 
@@ -168,7 +163,7 @@ export const CHORDS_DIFFICULTY_CONFIG: Record<Difficulty, ChordsDifficultyConfig
     showChordName: true,
     playMode: 'arpeggio',
     randomRoot: false,
-    description: '2 accordi • Maggiore e Minore • Nessun limite • Arpeggio • Root: C'
+    description: '2 accordi - Maggiore e Minore - Nessun limite - Arpeggio - Root: C'
   },
   medium: {
     chordTypes: ['major', 'minor', 'diminished', 'augmented', 'sus2', 'sus4'],
@@ -176,7 +171,7 @@ export const CHORDS_DIFFICULTY_CONFIG: Record<Difficulty, ChordsDifficultyConfig
     showChordName: true,
     playMode: 'arpeggio',
     randomRoot: false,
-    description: '6 accordi • Triadi complete • 15 secondi • Arpeggio • Root: C'
+    description: '6 accordi - Triadi complete - 15 secondi - Arpeggio - Root: C'
   },
   hard: {
     chordTypes: ['major', 'minor', 'diminished', 'augmented', 'maj7', 'dom7', 'min7', 'm7b5'],
@@ -184,7 +179,7 @@ export const CHORDS_DIFFICULTY_CONFIG: Record<Difficulty, ChordsDifficultyConfig
     showChordName: true,
     playMode: 'mixed',
     randomRoot: true,
-    description: '8 accordi • Triadi + Settime • 10 secondi • Arpeggio/Blocco • Root casuale'
+    description: '8 accordi - Triadi + Settime - 10 secondi - Arpeggio/Blocco - Root casuale'
   },
   pro: {
     chordTypes: ['major', 'minor', 'diminished', 'augmented', 'maj7', 'dom7', 'min7', 'm7b5', 'sus2', 'sus4', 'add9', 'ninth'],
@@ -192,7 +187,7 @@ export const CHORDS_DIFFICULTY_CONFIG: Record<Difficulty, ChordsDifficultyConfig
     showChordName: false,
     playMode: 'block',
     randomRoot: true,
-    description: '12 accordi • Full spectrum • 8 secondi • Blind mode • Blocco • Root casuale'
+    description: '12 accordi - Full spectrum - 8 secondi - Blind mode - Blocco - Root casuale'
   }
 };
 
@@ -209,7 +204,7 @@ export interface VocalDifficultyConfig {
   notes: VocalNote[];
   timeLimit: number | null;
   showNoteName: boolean;
-  allowance: number; // cents di tolleranza per accuracy
+  allowance: number;
   description: string;
 }
 
@@ -224,8 +219,8 @@ export const VOCAL_DIFFICULTY_CONFIG: Record<Difficulty, VocalDifficultyConfig> 
     ],
     timeLimit: null,
     showNoteName: true,
-    allowance: 50, // ±50 cents
-    description: '5 note centrali • Nessun limite • Range ristretto (C4-A4)'
+    allowance: 50,
+    description: '5 note centrali - Nessun limite - Range ristretto (C4-A4)'
   },
   medium: {
     notes: [
@@ -239,8 +234,8 @@ export const VOCAL_DIFFICULTY_CONFIG: Record<Difficulty, VocalDifficultyConfig> 
     ],
     timeLimit: 15,
     showNoteName: true,
-    allowance: 40, // ±40 cents
-    description: '7 note • 15 secondi • Range medio (C4-B4)'
+    allowance: 40,
+    description: '7 note - 15 secondi - Range medio (C4-B4)'
   },
   hard: {
     notes: [
@@ -259,8 +254,8 @@ export const VOCAL_DIFFICULTY_CONFIG: Record<Difficulty, VocalDifficultyConfig> 
     ],
     timeLimit: 10,
     showNoteName: true,
-    allowance: 30, // ±30 cents
-    description: '12 note • 10 secondi • Range esteso (G3-E5) • Salti d\'ottava'
+    allowance: 30,
+    description: '12 note - 10 secondi - Range esteso (G3-E5) - Salti d\'ottava'
   },
   pro: {
     notes: [
@@ -281,9 +276,9 @@ export const VOCAL_DIFFICULTY_CONFIG: Record<Difficulty, VocalDifficultyConfig> 
       { note: 'F5', frequency: 698.46 },
     ],
     timeLimit: 8,
-    showNoteName: false, // Blind mode
-    allowance: 20, // ±20 cents (molto preciso)
-    description: '15 note • 8 secondi • Full range (F3-F5) • Blind mode • Precisione massima'
+    showNoteName: false,
+    allowance: 20,
+    description: '15 note - 8 secondi - Full range (F3-F5) - Blind mode - Precisione massima'
   }
 };
 
@@ -292,7 +287,7 @@ export const VOCAL_DIFFICULTY_CONFIG: Record<Difficulty, VocalDifficultyConfig> 
 // ============================================
 
 export const getDifficultyLabel = (difficulty: Difficulty): string => {
-  return `${DIFFICULTY_META[difficulty].emoji} ${DIFFICULTY_META[difficulty].label}`;
+  return DIFFICULTY_META[difficulty].label;
 };
 
 export const getDifficultyColor = (difficulty: Difficulty): string => {

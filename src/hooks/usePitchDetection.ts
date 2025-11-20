@@ -4,7 +4,7 @@ interface PitchDetectionResult {
   frequency: number | null;
   note: string | null;
   cents: number | null;
-  clarity: number; // 0-1, quanto è chiaro il pitch
+  clarity: number;
 }
 
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -27,9 +27,8 @@ export const usePitchDetection = () => {
 
   // Autocorrelation algorithm per pitch detection
   const autoCorrelate = useCallback((buffer: Float32Array, sampleRate: number): number => {
-    // Minimum e maximum frequency (da ~80Hz a ~1000Hz per voce umana)
-    const minFreq = 80;
-    const maxFreq = 1000;
+    const minFreq = 20;
+    const maxFreq = 20000;
     const minSamples = Math.floor(sampleRate / maxFreq);
     const maxSamples = Math.floor(sampleRate / minFreq);
 
@@ -82,7 +81,7 @@ export const usePitchDetection = () => {
     };
   }, []);
 
-  // Main detection loop - using ref to avoid circular dependency
+  // Main detection loop
   useEffect(() => {
     const detect = () => {
       if (!analyserRef.current || !audioContextRef.current) return;
@@ -140,7 +139,14 @@ export const usePitchDetection = () => {
 
       // Setup Web Audio API
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      const audioContext = new AudioContextClass();
+      
+      // CRITICAL: Resume AudioContext after user gesture
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+      
       audioContextRef.current = audioContext;
 
       const analyser = audioContext.createAnalyser();
@@ -153,12 +159,12 @@ export const usePitchDetection = () => {
 
       setIsListening(true);
       
-      // Start detection loop after setting isListening
+      // Start detection loop
       setTimeout(() => {
         if (detectPitchRef.current) {
           detectPitchRef.current();
         }
-      }, 0);
+      }, 100);
     } catch (err) {
       console.error('Error accessing microphone:', err);
       setError('Impossibile accedere al microfono. Verifica i permessi.');
@@ -169,6 +175,7 @@ export const usePitchDetection = () => {
   const stopListening = useCallback(() => {
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
     }
 
     if (micStreamRef.current) {

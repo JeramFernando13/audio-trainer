@@ -1,71 +1,47 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from 'react';
-import { Mic, Save, TrendingUp, TrendingDown, Award, MicVocal } from 'lucide-react';
+import { Mic, Save, TrendingUp, TrendingDown, Award, MicVocal, AlertCircle } from 'lucide-react';
 import { usePitchDetection } from '../../../hooks/usePitchDetection';
-
-interface VoiceType {
-  name: string;
-  gender: string;
-  lowNote: string;
-  highNote: string;
-  lowFreq: number;
-  highFreq: number;
-  color: string;
-}
-
-const VOICE_TYPES: VoiceType[] = [
-  { name: 'Soprano', gender: 'Donna', lowNote: 'C4', highNote: 'C6', lowFreq: 261.63, highFreq: 1046.50, color: 'from-pink-400 to-pink-500' },
-  { name: 'Mezzosoprano', gender: 'Donna', lowNote: 'A3', highNote: 'A5', lowFreq: 220.00, highFreq: 880.00, color: 'from-purple-400 to-purple-500' },
-  { name: 'Contralto', gender: 'Donna', lowNote: 'F3', highNote: 'F5', lowFreq: 174.61, highFreq: 698.46, color: 'from-indigo-400 to-indigo-500' },
-  { name: 'Tenore', gender: 'Uomo', lowNote: 'C3', highNote: 'C5', lowFreq: 130.81, highFreq: 523.25, color: 'from-blue-400 to-blue-500' },
-  { name: 'Baritono', gender: 'Uomo', lowNote: 'A2', highNote: 'A4', lowFreq: 110.00, highFreq: 440.00, color: 'from-teal-400 to-teal-500' },
-  { name: 'Basso', gender: 'Uomo', lowNote: 'E2', highNote: 'E4', lowFreq: 82.41, highFreq: 329.63, color: 'from-green-400 to-green-500' },
-];
-
-const RANGE_STORAGE_KEY = 'audioTrainer_vocalRange';
-
-// Helper function to load saved range - outside component to avoid setState in effect
-const loadSavedRange = (): { low: string; high: string; type: string } | null => {
-  const saved = localStorage.getItem(RANGE_STORAGE_KEY);
-  return saved ? JSON.parse(saved) : null;
-};
+import { VOICE_TYPES, RANGE_STORAGE_KEY, loadSavedRange, type VoiceType } from '../../../data/vocal';
 
 export const VocalRangeFinder = () => {
-  const { pitch, startListening, stopListening } = usePitchDetection();
+  const { pitch, startListening, stopListening, isListening, error: micError } = usePitchDetection();
   const [step, setStep] = useState<'intro' | 'findLow' | 'findHigh' | 'results'>('intro');
   const [lowestNote, setLowestNote] = useState<{ note: string; freq: number } | null>(null);
   const [highestNote, setHighestNote] = useState<{ note: string; freq: number } | null>(null);
   const [savedRange, setSavedRange] = useState<{ low: string; high: string; type: string } | null>(loadSavedRange);
 
-  // Track lowest note - removed lowestNote from dependencies
+  // Track lowest note - ABBASSATA SOGLIA CLARITY
   useEffect(() => {
-    if (step === 'findLow' && pitch.frequency && pitch.note) {
+    if (step === 'findLow' && pitch.frequency && pitch.note && pitch.clarity ) {
       const currentFreq = pitch.frequency;
       const currentNote = pitch.note;
       
       setLowestNote(prev => {
         if (!prev || currentFreq < prev.freq) {
+          console.log('New lowest note:', currentNote, currentFreq);
           return { note: currentNote, freq: currentFreq };
         }
         return prev;
       });
     }
-  }, [step, pitch.frequency, pitch.note]);
+  }, [step, pitch.frequency, pitch.note, pitch.clarity]);
 
-  // Track highest note - removed highestNote from dependencies
+  // Track highest note - ABBASSATA SOGLIA CLARITY
   useEffect(() => {
-    if (step === 'findHigh' && pitch.frequency && pitch.note) {
+    if (step === 'findHigh' && pitch.frequency && pitch.note && pitch.clarity ) {
       const currentFreq = pitch.frequency;
       const currentNote = pitch.note;
       
       setHighestNote(prev => {
         if (!prev || currentFreq > prev.freq) {
+          console.log('New highest note:', currentNote, currentFreq);
           return { note: currentNote, freq: currentFreq };
         }
         return prev;
       });
     }
-  }, [step, pitch.frequency, pitch.note]);
+  }, [step, pitch.frequency, pitch.note, pitch.clarity]);
 
   const startFindingLow = async () => {
     setLowestNote(null);
@@ -104,7 +80,6 @@ export const VocalRangeFinder = () => {
   };
 
   const detectVoiceType = (lowFreq: number, highFreq: number): VoiceType | null => {
-    // Find voice type that best matches the range
     const matches = VOICE_TYPES.map(type => {
       const lowMatch = Math.abs(type.lowFreq - lowFreq);
       const highMatch = Math.abs(type.highFreq - highFreq);
@@ -123,7 +98,7 @@ export const VocalRangeFinder = () => {
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold justify-center text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 flex items-center justify-center gap-2">
             <MicVocal className="w-6 h-6" />
             Range Vocali
           </h2>
@@ -131,6 +106,22 @@ export const VocalRangeFinder = () => {
             Scopri il tuo range vocale e tipo di voce
           </p>
         </div>
+
+        {/* Error Display */}
+        {micError && (
+          <div className="mb-6 bg-red-50 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-700 rounded-xl p-4 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-red-700 dark:text-red-300 mb-1">
+                Errore Microfono
+              </p>
+              <p className="text-sm text-red-600 dark:text-red-400">{micError}</p>
+              <p className="text-xs text-red-500 dark:text-red-500 mt-2">
+                Assicurati di aver dato i permessi del microfono al browser
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Saved Range Display */}
         {savedRange && step === 'intro' && (
@@ -165,6 +156,15 @@ export const VocalRangeFinder = () => {
                   <li><strong>Step 3:</strong> Vedi il tuo range e tipo vocale</li>
                 </ol>
               </div>
+              
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4 mb-6">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
+                  <p className="text-sm text-yellow-700 dark:text-yellow-300 text-left">
+                    <strong>Importante:</strong> Il browser ti chiederà il permesso di usare il microfono. Clicca "Consenti" per continuare.
+                  </p>
+                </div>
+              </div>
             </div>
             <button
               onClick={startFindingLow}
@@ -197,20 +197,29 @@ export const VocalRangeFinder = () => {
                   <div className="text-6xl font-bold text-blue-600 dark:text-blue-400 mb-2">
                     {pitch.note}
                   </div>
-                  <div className="text-2xl text-gray-600 dark:text-gray-400 mb-6">
-                    {pitch.frequency} Hz
+                  <div className="text-2xl text-gray-600 dark:text-gray-400 mb-2">
+                    {Math.round(pitch.frequency)} Hz
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-500 mb-4">
+                    Clarity: {Math.round(pitch.clarity * 100)}%
                   </div>
                   {lowestNote && (
-                    <div className="text-sm text-green-600 dark:text-green-400 font-semibold">
-                      ✓ Nota più bassa: {lowestNote.note} ({Math.round(lowestNote.freq)} Hz)
+                    <div className="bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg p-3">
+                      <div className="text-sm text-green-600 dark:text-green-400 font-semibold">
+                        Nota più bassa registrata: {lowestNote.note} ({Math.round(lowestNote.freq)} Hz)
+                      </div>
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="text-center text-gray-400 dark:text-gray-500 py-12">
-                   <MicVocal className="w h mx-auto mb-4" />
-
-                  <p>Canta la tua nota più bassa...</p>
+                  <MicVocal className="w-16 h-16 mx-auto mb-4 animate-pulse" />
+                  <p className="mb-2 font-semibold">
+                    {isListening ? 'Microfono attivo - Canta ora!' : 'Attivazione microfono...'}
+                  </p>
+                  {isListening && (
+                    <p className="text-xs text-gray-500">Canta una nota lunga per farla rilevare</p>
+                  )}
                 </div>
               )}
             </div>
@@ -219,7 +228,7 @@ export const VocalRangeFinder = () => {
               <button
                 onClick={confirmLow}
                 disabled={!lowestNote}
-                className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-4 px-6 rounded-xl font-semibold transition shadow-lg"
+                className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-4 px-6 rounded-xl font-semibold transition shadow-lg"
               >
                 Conferma e Continua
               </button>
@@ -254,19 +263,29 @@ export const VocalRangeFinder = () => {
                   <div className="text-6xl font-bold text-orange-600 dark:text-orange-400 mb-2">
                     {pitch.note}
                   </div>
-                  <div className="text-2xl text-gray-600 dark:text-gray-400 mb-6">
-                    {pitch.frequency} Hz
+                  <div className="text-2xl text-gray-600 dark:text-gray-400 mb-2">
+                    {Math.round(pitch.frequency)} Hz
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-500 mb-4">
+                    Clarity: {Math.round(pitch.clarity * 100)}%
                   </div>
                   {highestNote && (
-                    <div className="text-sm text-green-600 dark:text-green-400 font-semibold">
-                      ✓ Nota più alta: {highestNote.note} ({Math.round(highestNote.freq)} Hz)
+                    <div className="bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg p-3">
+                      <div className="text-sm text-green-600 dark:text-green-400 font-semibold">
+                        Nota più alta registrata: {highestNote.note} ({Math.round(highestNote.freq)} Hz)
+                      </div>
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="text-center text-gray-400 dark:text-gray-500 py-12">
-                  <MicVocal className="w h mx-auto mb-4" />
-                  <p>Canta la tua nota più alta...</p>
+                  <MicVocal className="w-16 h-16 mx-auto mb-4 animate-pulse" />
+                  <p className="mb-2 font-semibold">
+                    {isListening ? 'Microfono attivo - Canta ora!' : 'Attivazione microfono...'}
+                  </p>
+                  {isListening && (
+                    <p className="text-xs text-gray-500">Canta una nota lunga per farla rilevare</p>
+                  )}
                 </div>
               )}
             </div>
@@ -275,7 +294,7 @@ export const VocalRangeFinder = () => {
               <button
                 onClick={confirmHigh}
                 disabled={!highestNote}
-                className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-4 px-6 rounded-xl font-semibold transition shadow-lg"
+                className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-4 px-6 rounded-xl font-semibold transition shadow-lg"
               >
                 Vedi Risultati
               </button>
@@ -293,8 +312,11 @@ export const VocalRangeFinder = () => {
         {step === 'results' && lowestNote && highestNote && voiceType && (
           <div>
             <div className="text-center mb-8">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Award className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+              </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                🎉 I tuoi risultati!
+                I tuoi risultati
               </h2>
             </div>
 
@@ -332,8 +354,9 @@ export const VocalRangeFinder = () => {
                   >
                     <div className="flex justify-between items-center">
                       <div>
-                        <div className="font-semibold text-gray-900 dark:text-white">
-                          {type.name} {type.name === voiceType.name && '✓'}
+                        <div className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                          {type.name} 
+                          {type.name === voiceType.name && <Award className="w-4 h-4 text-purple-500" />}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
                           {type.lowNote} - {type.highNote}

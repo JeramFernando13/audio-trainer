@@ -22,7 +22,6 @@ export const DifficultySelector = ({ difficulty, onChange }: DifficultySelectorP
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
             }`}
           >
-            <span className="mr-2">{meta.emoji}</span>
             {meta.label}
           </button>
         );

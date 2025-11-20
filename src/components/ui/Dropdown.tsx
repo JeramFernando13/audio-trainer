@@ -18,7 +18,7 @@ interface DropdownProps {
 
 export const Dropdown = ({ label, icon: Icon, items }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -34,16 +34,12 @@ export const Dropdown = ({ label, icon: Icon, items }: DropdownProps) => {
   // Group items by category
   const groupedItems = items.reduce((acc, item) => {
     const category = item.category || 'Other';
-    if (!acc[category]) {
-      acc[category] = [];
-    }
+    if (!acc[category]) acc[category] = [];
     acc[category].push(item);
     return acc;
   }, {} as Record<string, DropdownItem[]>);
-
   const categories = Object.keys(groupedItems);
 
-  // Category display names and colors
   const categoryInfo: Record<string, { name: string; bgColor: string }> = {
     'SE': { name: 'Sound Engineering', bgColor: 'bg-purple-50 dark:bg-purple-900/20' },
     'Musician': { name: 'Musicisti', bgColor: 'bg-blue-50 dark:bg-blue-900/20' },
@@ -51,7 +47,7 @@ export const Dropdown = ({ label, icon: Icon, items }: DropdownProps) => {
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div ref={dropdownRef} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition text-gray-900 dark:text-white font-medium"
@@ -62,10 +58,9 @@ export const Dropdown = ({ label, icon: Icon, items }: DropdownProps) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-2 min-w-[280px] z-50">
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 md:min-w-[280px] min-w-[245px] bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-2 z-9999">
           {categories.map((category, categoryIndex) => (
             <div key={category}>
-              {/* Category Header */}
               {categoryInfo[category] && (
                 <div className={`px-3 py-2 ${categoryInfo[category].bgColor} border-b border-gray-200 dark:border-gray-700`}>
                   <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
@@ -73,8 +68,7 @@ export const Dropdown = ({ label, icon: Icon, items }: DropdownProps) => {
                   </span>
                 </div>
               )}
-              
-              {/* Category Items */}
+
               {groupedItems[category].map((item) => (
                 <Link
                   key={item.path}
@@ -88,8 +82,7 @@ export const Dropdown = ({ label, icon: Icon, items }: DropdownProps) => {
                   </span>
                 </Link>
               ))}
-              
-              {/* Separator between categories */}
+
               {categoryIndex < categories.length - 1 && (
                 <div className="my-2 border-t border-gray-200 dark:border-gray-700" />
               )}

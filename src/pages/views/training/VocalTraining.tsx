@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback } from 'react';
 import { Play, RotateCcw, Mic, Clock, TrendingUp, Volume2, MicVocal } from 'lucide-react';
@@ -6,7 +7,9 @@ import { useStats } from '../../../hooks/useStats';
 import { usePitchDetection } from '../../../hooks/usePitchDetection';
 import { DifficultySelector } from '../../../components/ui/DifficultySelector';
 import { StatsPanel } from '../../../components/ui/StatsPanel';
-import { VOCAL_DIFFICULTY_CONFIG, type Difficulty } from '../../../data/difficulty';
+import { VOCAL_DIFFICULTY_CONFIG } from '../../../data/difficulty';
+
+type Difficulty = 'easy' | 'medium' | 'hard' | 'pro';
 
 export const VocalTraining = () => {
   const { playNote } = useAudio();
@@ -34,27 +37,39 @@ export const VocalTraining = () => {
 
   const currentNote = currentNoteIndex !== null ? config.notes[currentNoteIndex] : null;
 
-  // Check if user is singing the correct note
-  const checkAccuracy = useCallback(() => {
-    if (!currentNote || !pitch.note || !pitch.frequency) return null;
+  // Destructure pitch to keep deps minimal/stable
+  const detectedNote = pitch?.note;
+  const detectedFreq = pitch?.frequency;
+  const detectedCents = pitch?.cents;
 
-    // Remove octave from pitch.note for comparison
-    const currentNoteName = pitch.note.replace(/[0-9]/g, '');
+  // Check if user is singing the correct note
+  const checkAccuracy = useCallback((): number | null => {
+    if (!currentNote || !detectedNote || !detectedFreq) return null;
+
+    const currentNoteName = detectedNote.replace(/[0-9]/g, '');
     const targetNoteName = currentNote.note.replace(/[0-9]/g, '');
 
-    // Check if note matches (ignore octave for now)
     if (currentNoteName === targetNoteName) {
-      // Check cents accuracy
-      const cents = Math.abs(pitch.cents || 0);
+      const cents = Math.abs(detectedCents || 0);
       if (cents <= config.allowance) {
-        return 100 - (cents / config.allowance) * 30; // 100% at 0 cents, 70% at allowance
+        return 100 - (cents / config.allowance) * 30;
       }
     }
 
-    return 0;
-  }, [currentNote, pitch, config.allowance]);
+    if (difficulty === 'easy') {
+      return 50;
+    } else if (difficulty === 'medium') {
+      return 20;
+    } else if (difficulty === 'hard') {
+      return 10;
+    } else if (difficulty === 'pro') {
+      return 0;
+    }
 
-  // Handle submit - moved before useEffect that uses it
+    return null;
+  }, [currentNote, detectedNote, detectedFreq, detectedCents, config.allowance, difficulty]);
+
+  // Handle submit
   const handleSubmit = useCallback(() => {
     if (currentNoteIndex === null || showAnswer || accuracyHistory.length === 0) return;
 
@@ -69,9 +84,9 @@ export const VocalTraining = () => {
     recordAnswer('vocal' as any, difficulty, isCorrect);
 
     if (isCorrect) {
-      setFeedback(`✅ Corretto! Accuracy: ${Math.round(avgAccuracy)}%`);
+      setFeedback(`Corretto! Accuracy: ${Math.round(avgAccuracy)}%`);
     } else {
-      setFeedback(`❌ Sbagliato! Accuracy: ${Math.round(avgAccuracy)}% (minimo 70%)`);
+      setFeedback(`Sbagliato! Accuracy: ${Math.round(avgAccuracy)}% (minimo 70%)`);
     }
 
     setShowAnswer(true);
@@ -83,36 +98,38 @@ export const VocalTraining = () => {
     if (currentNoteIndex === null) return;
     setScore((prev) => ({ ...prev, total: prev.total + 1 }));
     recordAnswer('vocal' as any, difficulty, false);
-    setFeedback(`⏰ Tempo scaduto! Era: ${config.notes[currentNoteIndex].note}`);
+    setFeedback(`Tempo scaduto! Era: ${config.notes[currentNoteIndex].note}`);
     setShowAnswer(true);
     setIsHolding(false);
   }, [currentNoteIndex, config.notes, recordAnswer, difficulty]);
 
-  // Monitor holding note
+  // Monitor holding note - SIMPLIFIED
   useEffect(() => {
-    if (!isHolding || !currentNote) return;
+    if (!isHolding || !currentNote || !pitch.note || !pitch.frequency) return;
 
     const accuracy = checkAccuracy();
     if (accuracy && accuracy > 70) {
-      const timer = setTimeout(() => {
-        setHoldTime(prev => prev + 100);
-        setAccuracyHistory(prev => [...prev.slice(-19), accuracy]);
-      }, 100);
-
-      return () => clearTimeout(timer);
+      setHoldTime(prev => prev + 100);
+      setAccuracyHistory(prev => [...prev.slice(-19), accuracy]);
     }
-  }, [isHolding, pitch, currentNote, checkAccuracy]);
+
+    const interval = setInterval(() => {
+      const acc = checkAccuracy();
+      if (acc && acc > 70) {
+        setHoldTime(prev => prev + 100);
+        setAccuracyHistory(prev => [...prev.slice(-19), acc]);
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [isHolding, currentNote, checkAccuracy, pitch.note, pitch.frequency]);
 
   // Auto-submit after 3 seconds of good accuracy
   useEffect(() => {
     if (holdTime >= 3000 && accuracyHistory.length >= 20) {
       const avgAccuracy = accuracyHistory.reduce((a, b) => a + b, 0) / accuracyHistory.length;
       if (avgAccuracy > 70) {
-        // Defer submission to the next macrotask to avoid synchronous setState inside the effect
-        const timer = setTimeout(() => {
-          handleSubmit();
-        }, 0);
-        return () => clearTimeout(timer);
+        handleSubmit();
       }
     }
   }, [holdTime, accuracyHistory, handleSubmit]);
@@ -146,10 +163,8 @@ export const VocalTraining = () => {
     setAccuracyHistory([]);
     setIsHolding(false);
 
-    // Play reference note
     playNote(note.frequency, '1n');
 
-    // Auto-start listening if not already
     if (!isListening) {
       startListening();
     }
@@ -193,11 +208,12 @@ export const VocalTraining = () => {
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-             <MicVocal className="w-7 h-7 inline-block mr-2" /> Vocal Training
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center justify-center gap-2">
+            <MicVocal className="w-7 h-7" />
+            Vocal Training
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Canta la nota indicata
+            Canta la nota indicata e mantienila per 3 secondi
           </p>
         </div>
 
@@ -281,7 +297,7 @@ export const VocalTraining = () => {
                       {pitch.note}
                     </div>
                     <div className="text-lg text-gray-600 dark:text-gray-400">
-                      {pitch.frequency} Hz
+                      {Math.round(pitch.frequency || 0)} Hz
                     </div>
                     {currentAccuracy !== null && (
                       <div className="mt-4">
@@ -310,7 +326,7 @@ export const VocalTraining = () => {
                   </div>
                 ) : (
                   <div className="text-center text-gray-400 dark:text-gray-500 py-4">
-                    <div className="animate-pulse text-3xl mb-2">🎤</div>
+                    <MicVocal className="w-12 h-12 mx-auto mb-2 animate-pulse" />
                     <p>Canta la nota...</p>
                   </div>
                 )}
@@ -342,7 +358,7 @@ export const VocalTraining = () => {
                 <button
                   onClick={startHolding}
                   disabled={!isListening}
-                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-4 px-6 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg"
+                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-4 px-6 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg"
                 >
                   <Mic className="w-5 h-5" />
                   Hold Note (3s)
@@ -379,7 +395,7 @@ export const VocalTraining = () => {
         {feedback && (
           <div
             className={`mb-6 p-4 rounded-xl text-center font-semibold ${
-              feedback.startsWith('✅')
+              feedback.startsWith('Corretto')
                 ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
                 : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
             }`}
@@ -399,7 +415,7 @@ export const VocalTraining = () => {
                   <li>Click "Start Quiz" per iniziare</li>
                   <li>Ascolta la nota di riferimento (click "Replay" per riascoltare)</li>
                   <li>Click "Hold Note" e canta la stessa nota per 3 secondi</li>
-                  <li>Mantieni un'accuracy {'>'}70% per almeno 3 secondi</li>
+                  <li>Mantieni un'accuracy maggiore di 70% per almeno 3 secondi</li>
                   <li>Submit automatico se raggiungi il target!</li>
                 </ol>
               </div>

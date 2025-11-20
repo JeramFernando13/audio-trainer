@@ -118,7 +118,9 @@ export const NavBar = () => {
           
           {/* Navigation Dropdowns */}
           <div className="flex items-center gap-2">
-            <Dropdown label="Learn" icon={GraduationCap} items={learnItems} />
+            <div className="ml-4 sm:ml-0">
+              <Dropdown label="Learn" icon={GraduationCap} items={learnItems} />
+            </div>
             <Dropdown label="Train" icon={Target} items={trainItems} />
           </div>
 
