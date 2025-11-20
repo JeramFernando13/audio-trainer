@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Sliders, Music, Piano, Target, GraduationCap, Check, BarChart3, RotateCcw, Lightbulb, AudioWaveform, MicVocal } from 'lucide-react';
+import { Sliders, Music, GraduationCap, Check, Lightbulb, AudioWaveform, MicVocal } from 'lucide-react';
 
 export const Home = () => {
   const learnSections = [
@@ -32,9 +32,8 @@ export const Home = () => {
     },
   ];
 
-  const trainSections = [
-    {}
-  ];
+
+  
 
 
   return (
