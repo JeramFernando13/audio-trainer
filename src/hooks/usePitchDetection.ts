@@ -25,10 +25,11 @@ export const usePitchDetection = () => {
   const animationFrameRef = useRef<number | null>(null);
   const detectPitchRef = useRef<(() => void) | null>(null);
 
-  // Autocorrelation algorithm per pitch detection
+  // Autocorrelation algorithm per pitch detection - FIXED VERSION
   const autoCorrelate = useCallback((buffer: Float32Array, sampleRate: number): number => {
-    const minFreq = 20;
-    const maxFreq = 20000;
+    // Vocal range: 80Hz (E2) - 1200Hz (D6) è più che sufficiente per voce umana
+    const minFreq = 80;
+    const maxFreq = 1200;
     const minSamples = Math.floor(sampleRate / maxFreq);
     const maxSamples = Math.floor(sampleRate / minFreq);
 
@@ -39,29 +40,60 @@ export const usePitchDetection = () => {
     }
     rms = Math.sqrt(rms / buffer.length);
 
-    // Se il segnale è troppo debole, ritorna -1
-    if (rms < 0.01) return -1;
+    // CRITICAL: Soglia RMS più alta per evitare rumore di fondo
+    // 0.05 = circa -26dB, sotto questo è solo rumore
+    if (rms < 0.05) return -1;
 
-    // Autocorrelation
+    // Autocorrelation - FIXED: algoritmo corretto
     let bestOffset = -1;
     let bestCorrelation = 0;
 
     for (let offset = minSamples; offset < maxSamples; offset++) {
       let correlation = 0;
 
+      // FIXED: Somma PRODOTTI invece di differenze
+      // Questo è il vero algoritmo di autocorrelazione
       for (let i = 0; i < buffer.length - offset; i++) {
-        correlation += Math.abs(buffer[i] - buffer[i + offset]);
+        correlation += buffer[i] * buffer[i + offset];
       }
 
-      correlation = 1 - correlation / (buffer.length - offset);
+      // Normalizza per la lunghezza
+      correlation = correlation / (buffer.length - offset);
 
-      if (correlation > 0.9 && correlation > bestCorrelation) {
+      // FIXED: Cerca il MASSIMO, non inversione
+      if (correlation > 0.01 && correlation > bestCorrelation) {
         bestCorrelation = correlation;
         bestOffset = offset;
       }
     }
 
-    if (bestOffset === -1) return -1;
+    // FIXED: Verifica che la correlazione sia abbastanza forte
+    if (bestOffset === -1 || bestCorrelation < 0.01) return -1;
+
+    // Parabolic interpolation per precisione migliore
+    if (bestOffset > 0 && bestOffset < maxSamples - 1) {
+      // Calcola correlazione per offset vicini
+      let corrPrev = 0;
+      let corrNext = 0;
+
+      for (let i = 0; i < buffer.length - bestOffset - 1; i++) {
+        corrPrev += buffer[i] * buffer[i + bestOffset - 1];
+        corrNext += buffer[i] * buffer[i + bestOffset + 1];
+      }
+
+      corrPrev = corrPrev / (buffer.length - bestOffset - 1);
+      corrNext = corrNext / (buffer.length - bestOffset - 1);
+
+      // Interpolazione parabolica
+      const a = corrPrev;
+      const b = bestCorrelation;
+      const c = corrNext;
+      const offset = 0.5 * (a - c) / (a - 2 * b + c);
+
+      if (Math.abs(offset) < 1) {
+        bestOffset = bestOffset + offset;
+      }
+    }
 
     return sampleRate / bestOffset;
   }, []);
@@ -94,8 +126,10 @@ export const usePitchDetection = () => {
 
       const frequency = autoCorrelate(buffer, audioContextRef.current.sampleRate);
 
-      if (frequency > 0) {
+      if (frequency > 0 && frequency >= 80 && frequency <= 1200) {
         const { note, cents } = frequencyToNote(frequency);
+        
+        // Clarity basato su quanto la frequenza è stabile
         const clarity = Math.min(1, frequency / 1000);
 
         setPitch({
@@ -131,7 +165,7 @@ export const usePitchDetection = () => {
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          autoGainControl: false,
+          autoGainControl: false, // Importante: non vogliamo AGC per pitch detection
         },
       });
 
@@ -150,8 +184,8 @@ export const usePitchDetection = () => {
       audioContextRef.current = audioContext;
 
       const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 2048;
-      analyser.smoothingTimeConstant = 0.8;
+      analyser.fftSize = 4096; // INCREASED: Più samples = più precisione per note basse
+      analyser.smoothingTimeConstant = 0.3; // REDUCED: Meno smoothing = più reattivo
       analyserRef.current = analyser;
 
       const source = audioContext.createMediaStreamSource(stream);

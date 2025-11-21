@@ -1,10 +1,9 @@
-import { AudioLines, GraduationCap, Music, Piano, Sliders, Target, Volume2, Waves, MicVocal, Speech } from "lucide-react";
+import { AudioLines, GraduationCap, Music, Piano, Sliders, Target, Waves, MicVocal, Speech } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Dropdown } from "../ui/Dropdown";
-import { useAudio } from "../../hooks/useAudio";
+import { VolumeController } from '../audio/VolumeController';
 
 export const NavBar = () => {
-  const { volume, setVolume } = useAudio();
 
   // LEARN ITEMS - Organized by category with colors
   const learnItems = [
@@ -116,7 +115,6 @@ export const NavBar = () => {
   ];
 
   // Convert dB (-40 to 0) to percentage (0% to 100%)
-  const volumePercent = Math.round(((volume + 40) / 40) * 100);
 
   return (
     <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-sm">
@@ -141,20 +139,8 @@ export const NavBar = () => {
           {/* Controls */}
           <div className="flex items-center gap-4">
             {/* Volume Control */}
-            <div className="hidden md:flex items-center gap-3 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
-              <Volume2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-              <input
-                type="range"
-                min="-40"
-                max="0"
-                value={volume}
-                onChange={(e) => setVolume(Number(e.target.value))}
-                className="w-24 h-2 bg-gray-300 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-blue-600"
-              />
-              <span className="text-xs text-gray-600 dark:text-gray-400 w-12 text-right font-medium">
-                {volumePercent}%
-              </span>
-            </div>
+            <VolumeController />
+            
 
             {/* Theme Toggle */}
             {/* <ThemeToggle /> */}
