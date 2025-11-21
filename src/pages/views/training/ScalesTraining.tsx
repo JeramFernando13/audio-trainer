@@ -149,7 +149,7 @@ export const ScalesTraining = () => {
 
   if (availableScales.length < 4) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-800 text-white flex items-center justify-center p-4">
         <div className="text-center">
           <Trophy className="w-16 h-16 text-gray-600 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-400 mb-2">Not Enough Scales</h2>
@@ -160,9 +160,9 @@ export const ScalesTraining = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-4 md:p-8">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-8">
       {/* Header */}
-      <div className="max-w-4xl mx-auto mb-8">
+      <div className="max-w-4xl mx-auto mb-8 ">
         <div className="flex items-center gap-3 mb-2">
           <Target className="w-8 h-8 text-purple-400" />
           <h1 className="text-3xl md:text-4xl font-bold">Scale Recognition Training</h1>
@@ -174,7 +174,7 @@ export const ScalesTraining = () => {
 
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Difficulty Selector */}
-        <div className="bg-gray-900 rounded-lg p-6">
+        <div className="bg-gray-700 rounded-lg p-6">
           <h2 className="text-xl font-bold mb-4">Difficulty Level</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {(['easy', 'medium', 'hard', 'pro'] as Difficulty[]).map((level) => {
