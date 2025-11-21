@@ -39,6 +39,13 @@ export const NavBar = () => {
       category: 'Musician',
       color: 'text-blue-600 dark:text-blue-400'
     },
+        { 
+      path: '/learn/scales', 
+      label: 'Scale', 
+      icon: Piano,
+      category: 'Musician',
+      color: 'text-blue-600 dark:text-blue-400'
+    },
     
     // Vocalists (Green theme)
     { 
@@ -86,6 +93,13 @@ export const NavBar = () => {
     { 
       path: '/train/chords', 
       label: 'Chord Quiz', 
+      icon: Piano,
+      category: 'Musician',
+      color: 'text-blue-600 dark:text-blue-400'
+    },
+    { 
+      path: '/train/scales', 
+      label: 'Scale Quiz', 
       icon: Piano,
       category: 'Musician',
       color: 'text-blue-600 dark:text-blue-400'

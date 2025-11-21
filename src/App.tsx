@@ -7,17 +7,27 @@ import { Home } from './pages/Home';
 // Learn Pages
 import { FrequencyLearn } from './pages/views/learn/FrequencyLearn';
 import { SineWaveLearn } from './pages/views/learn/SineWaveLearn';
+
 import { IntervalsLearn } from './pages/views/learn/IntervalLearn';
 import { ChordsLearn } from './pages/views/learn/ChordsLearn';
+import { ScalesLearn } from './pages/views/learn/ScalesLearn';
+
+
 import { VocalLearn } from './pages/views/learn/VocalLearn';
 import { VocalRangeFinder } from './pages/views/learn/VocalRangeFinder';
+
 
 // Training Pages
 import { FrequencyTraining } from './pages/views/training/FrequencyTraining';
 import { SineWaveTraining } from './pages/views/training/SineWaveTraining';
+
 import { IntervalTraining } from './pages/views/training/IntervalTraining';
 import { ChordsTraining } from './pages/views/training/ChordsTraining';
+import { ScalesTraining } from './pages/views/training/ScalesTraining';
+
 import { VocalTraining } from './pages/views/training/VocalTraining';
+
+// Categories
 import { Musicians } from './pages/categories/Musicians';
 import { Singers } from './pages/categories/Singers';
 import { SoundEngineers } from './pages/categories/SoundEngineers';
@@ -39,16 +49,23 @@ function App() {
               {/* Learn Routes - Organized by category */}
               <Route path="/learn/frequency" element={<FrequencyLearn />} />
               <Route path="/learn/sine-wave" element={<SineWaveLearn />} />
+             
               <Route path="/learn/intervals" element={<IntervalsLearn />} />
               <Route path="/learn/chords" element={<ChordsLearn />} />
+             <Route path="/learn/scales" element={<ScalesLearn />} />
+
               <Route path="/learn/vocal" element={<VocalLearn />} />
               <Route path="/learn/vocal-range" element={<VocalRangeFinder />} />
               
               {/* Training Routes - Organized by category */}
               <Route path="/train/frequency" element={<FrequencyTraining />} />
               <Route path="/train/sine-wave" element={<SineWaveTraining />} />
+              
               <Route path="/train/intervals" element={<IntervalTraining />} />
               <Route path="/train/chords" element={<ChordsTraining />} />
+              <Route path="/train/scales" element={<ScalesTraining />} />
+              
+              
               <Route path="/train/vocal" element={<VocalTraining />} />
             </Routes>
           </Layout>

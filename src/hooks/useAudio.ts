@@ -119,6 +119,37 @@ export const useAudio = () => {
     }, duration * 1000);
   }, [applyVolume]);
 
+  // Aggiungi questa funzione dentro il tuo hook useAudio
+
+const playScale = async (
+  intervals: number[],
+  direction: 'ascending' | 'descending' = 'ascending'
+): Promise<void> => {
+  const synth = new Tone.Synth().toDestination();
+  const baseFreq = 261.63; // C4
+
+  const frequencies = intervals.map((semitone) =>
+    baseFreq * Math.pow(2, semitone / 12)
+  );
+
+  // Reverse if descending
+  const playOrder = direction === 'descending' 
+    ? [...frequencies].reverse() 
+    : frequencies;
+
+  const now = Tone.now();
+  playOrder.forEach((freq, index) => {
+    synth.triggerAttackRelease(freq, '8n', now + index * 0.3);
+  });
+
+  // Wait for scale to finish
+  await new Promise(resolve => 
+    setTimeout(resolve, playOrder.length * 300 + 500)
+  );
+  
+  synth.dispose();
+};
+
   return {
     playNote,
     playInterval,
@@ -128,5 +159,6 @@ export const useAudio = () => {
     playFrequencySweep,
     volume,
     setVolume,
+    playScale,
   };
 };
