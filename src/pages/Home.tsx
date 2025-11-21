@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Sliders, Music, GraduationCap, Check, Lightbulb, AudioWaveform, MicVocal } from 'lucide-react';
+import { Sliders, Music, GraduationCap, Check, Lightbulb, AudioWaveform, MicVocal, Music2, AudioLines } from 'lucide-react';
 
 export const Home = () => {
   const learnSections = [
@@ -15,7 +15,7 @@ export const Home = () => {
     {
       title: 'Musicians',
       description: 'Esplora intervalli e accordi con esempi pratici e teoria musicale.',
-      icon: Music,
+      icon: Music2,
       path: '/musicians',
       color: 'from-blue-500 to-indigo-600',
       features: ['Intervalli Musicali', 'Accordi'],
@@ -41,7 +41,7 @@ export const Home = () => {
       {/* Hero Section */}
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center gap-3 mb-4">
-          <Music className="w-12 h-12 text-blue-600 dark:text-blue-400" />
+          <AudioLines className="w-12 h-12 text-blue-600 dark:text-blue-400" />
           <h1 className="text-5xl font-bold text-gray-900 dark:text-white">
             Audio Trainer
           </h1>
