@@ -7,7 +7,7 @@ interface MetronomeProps {
   timeSignature?: string;
   isPlaying?: boolean;
   onToggle?: () => void;
-  accent?: boolean; // Accenta il primo beat
+  accent?: boolean;
 }
 
 export const Metronome = ({ 
@@ -84,7 +84,6 @@ export const Metronome = ({
       Tone.getTransport().start();
     } else {
       Tone.getTransport().stop();
-      // Don't reset beat here - let cleanup handle it
     }
 
     return () => {
@@ -92,7 +91,6 @@ export const Metronome = ({
         loopRef.current.stop();
       }
       Tone.getTransport().stop();
-      // Reset beat in cleanup instead
       setCurrentBeat(0);
     };
   }, [playing, bpm, beatsPerBar, accent]);

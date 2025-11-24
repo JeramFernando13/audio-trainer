@@ -33,6 +33,7 @@ import { Singers } from './pages/categories/Singers';
 import { SoundEngineers } from './pages/categories/SoundEngineers';
 import { RhythmLearn } from './pages/views/learn/RhythmLearn';
 import { RhythmTraining } from './pages/views/training/RhythmTraining';
+import { Metronome } from './pages/tools/MetronomePage';
 
 function App() {
   return (
@@ -42,6 +43,8 @@ function App() {
           <Layout>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/metronome" element={<Metronome />} />
+
               
               {/* Category Pages */}
               <Route path="/musicians" element={<Musicians />} />

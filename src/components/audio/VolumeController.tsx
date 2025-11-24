@@ -8,6 +8,7 @@ export const VolumeController = () => {
   const [previousVolume, setPreviousVolume] = useState<number>(-6);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const hasInteractedRef = useRef(false); // ✅ Track if user has interacted
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -26,25 +27,33 @@ export const VolumeController = () => {
     };
   }, [isOpen]);
 
-  // Apply volume to Tone.js
-  useEffect(() => {
+  // ✅ FIXED: Only apply volume AFTER user interaction
+  const applyVolume = async () => {
+    // Start audio context on first interaction
+    if (!hasInteractedRef.current) {
+      await Tone.start();
+      hasInteractedRef.current = true;
+    }
+
+    // Now safe to apply volume
     if (isMuted) {
       Tone.getDestination().volume.value = -Infinity;
     } else {
       const clampedDb = Math.max(-24, Math.min(0, volumeDb));
       Tone.getDestination().volume.value = clampedDb;
     }
-  }, [volumeDb, isMuted]);
+  };
 
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVolumeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolumeDb = parseFloat(e.target.value);
     setVolumeDb(newVolumeDb);
     if (isMuted) {
       setIsMuted(false);
     }
+    await applyVolume(); // ✅ Apply only when user interacts
   };
 
-  const toggleMute = () => {
+  const toggleMute = async () => {
     if (isMuted) {
       setIsMuted(false);
       setVolumeDb(previousVolume);
@@ -52,6 +61,7 @@ export const VolumeController = () => {
       setPreviousVolume(volumeDb);
       setIsMuted(true);
     }
+    await applyVolume(); // ✅ Apply only when user interacts
   };
 
   const dbToPercent = (db: number): number => {

@@ -4,7 +4,7 @@ import { AudioWaveform, Sliders, Waves } from 'lucide-react';
 export const SoundEngineers = () => {
   const learnSections = [
     {
-      title: 'Frequenze (Pink Noise)',
+      title: 'EQ & Pink Noise',
       description: 'Impara a conoscere le frequenze audio utilizzando il rumore rosa come riferimento.',
       icon: Sliders,
       path: '/learn/frequency',
@@ -25,7 +25,7 @@ export const SoundEngineers = () => {
 
   const trainSections = [
     {
-      title: 'Frequency (Pink Noise) Quiz',
+      title: 'Pink Noise Quiz',
       description: 'Metti alla prova la tua capacità di identificare frequenze utilizzando il rumore rosa.',
       icon: Sliders,
       path: '/train/frequency',

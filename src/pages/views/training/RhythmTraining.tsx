@@ -1,14 +1,14 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback } from 'react';
-import { Play, RotateCcw, Volume2, Clock, TrendingUp,Drum } from 'lucide-react';   
+import { Play, RotateCcw, Trophy, Clock, Target, Drum } from 'lucide-react';
 import { useAudio } from '../../../hooks/useAudio';
 import { useStats } from '../../../hooks/useStats';
-import { DifficultySelector } from '../../../components/ui/DifficultySelector';
-import { StatsPanel } from '../../../components/ui/StatsPanel';
 import { RHYTHM_PATTERNS, RHYTHM_DIFFICULTY_CONFIG } from '../../../data/rhythms';
 import { RhythmVisualizer } from '../../../components/rhythm/RhythmVisualizer';
 import { Metronome } from '../../../components/rhythm/Metronome';
-import { type Difficulty } from '../../../data/difficulty';
+
+type Difficulty = 'easy' | 'medium' | 'hard' | 'pro';
 
 export const RhythmTraining = () => {
   const { playRhythm } = useAudio();
@@ -16,51 +16,64 @@ export const RhythmTraining = () => {
     currentStreak,
     recordAnswer,
     resetStreak,
-    getStats,
+    // getStats,
     getOverallAccuracy,
   } = useStats();
 
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [currentPatternIndex, setCurrentPatternIndex] = useState<number | null>(null);
   const [options, setOptions] = useState<typeof RHYTHM_PATTERNS>([]);
-  const [score, setScore] = useState({ correct: 0, total: 0 });
-  const [feedback, setFeedback] = useState<string>('');
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [score, setScore] = useState({ correct: 0, total: 0 });
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
   const config = RHYTHM_DIFFICULTY_CONFIG[difficulty];
-  const availablePatterns = RHYTHM_PATTERNS.filter((p) => config.patterns.includes(p.name));
-  const savedStats = getStats('rhythm', difficulty);
+  const availablePatterns = RHYTHM_PATTERNS.filter((pattern) =>
+    config.patterns.includes(pattern.name)
+  );
 
-  const handleTimeout = useCallback(() => {
-    if (currentPatternIndex === null) return;
-    setScore((prev) => ({ ...prev, total: prev.total + 1 }));
-    recordAnswer('rhythm' as any, difficulty, false);
-    setFeedback(`⏰ Tempo scaduto! Era: ${options[currentPatternIndex].name}`);
-    setShowAnswer(true);
-  }, [currentPatternIndex, options, recordAnswer, difficulty]);
+    const currentPattern = currentPatternIndex !== null ? availablePatterns[currentPatternIndex] : null;
 
-  // Timer logic
+    
+    const handleAnswer = (patternName: string) => {
+        if (showAnswer || !currentPattern) return;
+
+        setSelectedAnswer(patternName);
+        setShowAnswer(true);
+
+        const isCorrect = patternName === currentPattern.name;
+
+        // Record answer with 'rhythm' as any to avoid TypeScript error temporarily
+        recordAnswer('rhythm' as any, difficulty, isCorrect);
+
+        // Update local score
+        setScore((prev) => ({
+        correct: prev.correct + (isCorrect ? 1 : 0),
+        total: prev.total + 1,
+        }));
+    };
+  // Timer countdown
   useEffect(() => {
-    if (timeLeft === null || timeLeft <= 0 || showAnswer) return;
+    if (!config.timeLimit || !currentPattern || showAnswer || timeLeft === null) return;
+
+    if (timeLeft <= 0) {
+      handleAnswer('');
+      return;
+    }
 
     const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev === null || prev <= 1) {
-          handleTimeout();
-          return null;
-        }
-        return prev - 1;
-      });
+      setTimeLeft((prev) => (prev !== null ? prev - 1 : null));
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, showAnswer, handleTimeout]);
+  }, [timeLeft, showAnswer, currentPattern, config.timeLimit, handleAnswer]);
 
-  const generateNewPattern = () => {
+  const generateQuestion = useCallback(() => {
     if (availablePatterns.length < 4) return;
 
-    // Pick random correct pattern
+    // Pick random pattern
     const correctIndex = Math.floor(Math.random() * availablePatterns.length);
     const correct = availablePatterns[correctIndex];
 
@@ -70,237 +83,283 @@ export const RhythmTraining = () => {
 
     while (wrongOptions.length < 3 && otherPatterns.length > 0) {
       const randomIndex = Math.floor(Math.random() * otherPatterns.length);
-      wrongOptions.push(otherPatterns.splice(randomIndex, 1)[0]);
+      const pattern = otherPatterns.splice(randomIndex, 1)[0];
+      wrongOptions.push(pattern);
     }
 
     // Shuffle all options
     const allOptions = [correct, ...wrongOptions].sort(() => Math.random() - 0.5);
-    const correctIndexInOptions = allOptions.findIndex(p => p.name === correct.name);
 
-    setCurrentPatternIndex(correctIndexInOptions);
+    setCurrentPatternIndex(availablePatterns.indexOf(correct));
     setOptions(allOptions);
-    setFeedback('');
+    setSelectedAnswer(null);
     setShowAnswer(false);
     setTimeLeft(config.timeLimit);
+  }, [availablePatterns, config]);
 
-    // Play rhythm
-    playRhythm(correct.pattern, correct.bpm);
-  };
-
-  const handleGuess = (index: number) => {
-    if (currentPatternIndex === null || showAnswer) return;
-
-    const isCorrect = index === currentPatternIndex;
-    setScore((prev) => ({
-      correct: prev.correct + (isCorrect ? 1 : 0),
-      total: prev.total + 1,
-    }));
-
-    recordAnswer('rhythm' as any, difficulty, isCorrect);
-
-    if (isCorrect) {
-      setFeedback('✅ Corretto!');
-    } else {
-      setFeedback(`❌ Sbagliato! Era: ${options[currentPatternIndex].name}`);
+  useEffect(() => {
+    if (availablePatterns.length >= 4) {
+      generateQuestion();
     }
-    setShowAnswer(true);
-    setTimeLeft(null);
+  }, [availablePatterns.length, difficulty, generateQuestion]);
+
+  const playCurrentPattern = async () => {
+    if (!currentPattern || isPlaying) return;
+
+    setIsPlaying(true);
+    try {
+      await playRhythm(currentPattern.pattern, currentPattern.bpm);
+    } catch (error) {
+      console.error('Error playing rhythm:', error);
+    } finally {
+      setIsPlaying(false);
+    }
   };
 
-  const repeatPattern = () => {
-    if (currentPatternIndex === null) return;
-    const pattern = options[currentPatternIndex];
-    playRhythm(pattern.pattern, pattern.bpm);
+ 
+
+  const nextQuestion = () => {
+    generateQuestion();
   };
 
-  const resetScore = () => {
+  const resetQuiz = () => {
     setScore({ correct: 0, total: 0 });
-    setCurrentPatternIndex(null);
-    setOptions([]);
-    setFeedback('');
-    setShowAnswer(false);
-    setTimeLeft(null);
     resetStreak();
+    generateQuestion();
   };
 
   const handleDifficultyChange = (newDifficulty: Difficulty) => {
     setDifficulty(newDifficulty);
-    resetScore();
+    setScore({ correct: 0, total: 0 });
+    resetStreak();
   };
 
-  const accuracy = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
-  const currentPattern = currentPatternIndex !== null ? options[currentPatternIndex] : null;
+//   const savedStats = getStats('rhythm' as any, difficulty);
+  const overallAccuracy = getOverallAccuracy('rhythm' as never);
+
+  if (availablePatterns.length < 4) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center p-4">
+        <div className="text-center">
+          <Trophy className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-400 mb-2">Not Enough Patterns</h2>
+          <p className="text-gray-500">Need at least 4 patterns for this difficulty level.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 md:p-8">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <Drum className="w-6 md:w-8 h-6 md:h-8 text-blue-600 dark:text-blue-400" />
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-              Rhythm Training
-            </h1>
-          </div>
-          <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
-            Riconosci il pattern ritmico
-          </p>
+    <div className="min-h-screen bg-gray-950 text-white p-4 md:p-8">
+      {/* Header */}
+      <div className="max-w-4xl mx-auto mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <Target className="w-8 h-8 text-green-400" />
+          <h1 className="text-3xl md:text-4xl font-bold">Rhythm Recognition Training</h1>
         </div>
+        <p className="text-gray-400 text-lg">
+          Listen to the rhythm pattern and identify it. Train your rhythmic ear!
+        </p>
+      </div>
 
+      <div className="max-w-4xl mx-auto space-y-6">
         {/* Difficulty Selector */}
-        <div className="mb-4">
-          <DifficultySelector difficulty={difficulty} onChange={handleDifficultyChange} />
-          <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 text-center mt-2">
-            {config.description}
-          </p>
+        <div className="bg-gray-900 rounded-lg p-6">
+          <h2 className="text-xl font-bold mb-4">Difficulty Level</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {(['easy', 'medium', 'hard', 'pro'] as Difficulty[]).map((level) => {
+              const levelConfig = RHYTHM_DIFFICULTY_CONFIG[level];
+              return (
+                <button
+                  key={level}
+                  onClick={() => handleDifficultyChange(level)}
+                  className={`p-4 rounded-lg text-left transition-all border-2 ${
+                    difficulty === level
+                      ? 'bg-green-900 border-green-500'
+                      : 'bg-gray-800 border-gray-700 hover:border-green-500'
+                  }`}
+                >
+                  <div className="font-bold mb-1">{levelConfig.label}</div>
+                  <div className="text-xs text-gray-400">{levelConfig.description}</div>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Stats Panel */}
-        <div className="mb-4">
-          <StatsPanel
-            quizType="rhythm"
-            currentCorrect={score.correct}
-            currentTotal={score.total}
-            currentStreak={currentStreak}
-            bestStreak={savedStats.bestStreak}
-            overallAccuracy={getOverallAccuracy('rhythm')}
-            lastPlayed={savedStats.lastPlayed}
-          />
-        </div>
-
-        {/* Current Session Stats */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-xl text-center">
-            <div className="text-xl md:text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {score.correct}
+        {/* Stats Overview */}
+        <div className="bg-gray-900 rounded-lg p-6">
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <Trophy className="w-6 h-6 text-yellow-400" />
+            Statistics
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-gray-800 rounded-lg p-4">
+              <div className="text-sm text-gray-400 mb-1">Current Streak</div>
+              <div className="text-2xl font-bold text-yellow-400">{currentStreak}</div>
             </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">Correct</div>
-          </div>
-          <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-xl text-center">
-            <div className="text-xl md:text-2xl font-bold text-purple-600 dark:text-purple-400">
-              {score.total}
-            </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">Total</div>
-          </div>
-          <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-xl text-center">
-            <div className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
-              {accuracy}%
-            </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">Accuracy</div>
-          </div>
-        </div>
-
-        {/* Timer */}
-        {timeLeft !== null && !showAnswer && (
-          <div className="mb-4 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-xl flex items-center justify-center gap-2">
-            <Clock className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
-            <span className="text-base md:text-lg font-bold text-yellow-600 dark:text-yellow-400">
-              {timeLeft}s
-            </span>
-          </div>
-        )}
-
-        {/* Metronome */}
-        {config.showMetronome && currentPattern && currentPatternIndex !== null && (
-          <div className="mb-4">
-            <Metronome bpm={currentPattern.bpm} timeSignature={currentPattern.timeSignature} />
-          </div>
-        )}
-
-        {/* Controls */}
-        <div className="flex flex-col md:flex-row gap-3 mb-4">
-          <button
-            onClick={generateNewPattern}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg text-sm md:text-base"
-          >
-            <Play className="w-5 h-5" />
-            {currentPatternIndex === null ? 'Start Quiz' : 'Next Question'}
-          </button>
-
-          {currentPatternIndex !== null && (
-            <button
-              onClick={repeatPattern}
-              className="flex-1 md:flex-initial bg-gray-600 hover:bg-gray-700 text-white py-3 px-4 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg text-sm md:text-base"
-            >
-              <Volume2 className="w-5 h-5" />
-              Replay
-            </button>
-          )}
-
-          <button
-            onClick={resetScore}
-            className="md:w-auto bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg text-sm md:text-base"
-          >
-            <RotateCcw className="w-5 h-5" />
-            Reset
-          </button>
-        </div>
-
-        {/* Feedback */}
-        {feedback && (
-          <div
-            className={`mb-4 p-3 md:p-4 rounded-xl text-center text-sm md:text-base font-semibold ${
-              feedback.startsWith('✅')
-                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
-            }`}
-          >
-            {feedback}
-          </div>
-        )}
-
-        {/* Rhythm Visualizer (if enabled and answered) */}
-        {config.showVisual && showAnswer && currentPattern && (
-          <div className="mb-4">
-            <RhythmVisualizer pattern={currentPattern.pattern} showLabels={true} />
-          </div>
-        )}
-
-        {/* Options */}
-        {currentPatternIndex !== null && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {options.map((pattern, index) => (
-              <button
-                key={index}
-                onClick={() => handleGuess(index)}
-                disabled={showAnswer}
-                className={`p-3 md:p-4 rounded-xl font-semibold transition border-2 text-left ${
-                  showAnswer && index === currentPatternIndex
-                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-500'
-                    : showAnswer
-                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-300 dark:border-gray-600 cursor-not-allowed'
-                    : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20'
-                }`}
-              >
-                <div className="text-sm md:text-base">{pattern.name}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {pattern.timeSignature} • {pattern.bpm} BPM
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-500 mt-1">
-                  {pattern.notation}
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Tips */}
-        {currentPatternIndex === null && (
-          <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 p-4 md:p-6 rounded-xl">
-            <div className="flex items-start gap-3">
-              <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-1 shrink-0" />
-              <div className="text-xs md:text-sm text-gray-700 dark:text-gray-300">
-                <strong className="block mb-2">Tips:</strong>
-                <ul className="space-y-1 list-disc list-inside">
-                  <li><strong>Easy:</strong> Pattern base in 4/4</li>
-                  <li><strong>Medium:</strong> Sincope e variazioni</li>
-                  <li><strong>Hard:</strong> Terzine e pattern complessi</li>
-                  <li><strong>Pro:</strong> Poliritmi e tempi dispari</li>
-                </ul>
+            <div className="bg-gray-800 rounded-lg p-4">
+              <div className="text-sm text-gray-400 mb-1">Session Score</div>
+              <div className="text-2xl font-bold text-blue-400">
+                {score.correct}/{score.total}
               </div>
             </div>
+            <div className="bg-gray-800 rounded-lg p-4">
+              <div className="text-sm text-gray-400 mb-1">Session Accuracy</div>
+              <div className="text-2xl font-bold text-green-400">
+                {score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0}%
+              </div>
+            </div>
+            <div className="bg-gray-800 rounded-lg p-4">
+              <div className="text-sm text-gray-400 mb-1">Overall Accuracy</div>
+              <div className="text-2xl font-bold text-purple-400">{overallAccuracy}%</div>
+            </div>
           </div>
-        )}
+        </div>
+
+        {/* Main Quiz Area */}
+        <div className="bg-gray-900 rounded-lg p-8">
+          {/* Timer */}
+          <div className="flex items-center justify-between mb-6">
+            {config.timeLimit && timeLeft !== null && !showAnswer && (
+              <div
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold ${
+                  timeLeft <= 5 ? 'bg-red-900 text-red-300' : 'bg-gray-800 text-gray-300'
+                }`}
+              >
+                <Clock className="w-5 h-5" />
+                {timeLeft}s
+              </div>
+            )}
+            <button
+              onClick={resetQuiz}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-all ml-auto"
+            >
+              <RotateCcw className="w-5 h-5" />
+              Reset
+            </button>
+          </div>
+
+          {/* Metronome (if enabled) */}
+          {config.showMetronome && currentPattern && (
+            <div className="mb-6">
+              <Metronome bpm={currentPattern.bpm} timeSignature={currentPattern.timeSignature} /> 
+            </div>
+          )}
+
+          {/* Play Pattern Button */}
+          <div className="text-center mb-8">
+            <button
+              onClick={playCurrentPattern}
+              disabled={isPlaying || !currentPattern}
+              className={`inline-flex items-center gap-3 px-12 py-6 rounded-lg text-xl font-bold transition-all ${
+                isPlaying
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-green-500/50'
+              }`}
+            >
+              <Play className={`w-8 h-8 ${isPlaying ? 'animate-pulse' : ''}`} />
+              {isPlaying ? 'Playing Pattern...' : 'Play Rhythm Pattern'}
+            </button>
+            <p className="text-gray-400 mt-4">
+              Listen carefully and select the rhythm you hear
+            </p>
+          </div>
+
+          {/* Visual Pattern (if enabled and answered) */}
+          {config.showVisual && showAnswer && currentPattern && (
+            <div className="mb-6">
+              <RhythmVisualizer pattern={currentPattern.pattern} showLabels={true} />
+            </div>
+          )}
+
+          {/* Options Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {options.map((pattern) => {
+              const isCorrect = pattern.name === currentPattern?.name;
+              const isSelected = pattern.name === selectedAnswer;
+              const shouldShowCorrect = showAnswer && isCorrect;
+              const shouldShowWrong = showAnswer && isSelected && !isCorrect;
+
+              return (
+                <button
+                  key={pattern.name}
+                  onClick={() => handleAnswer(pattern.name)}
+                  disabled={showAnswer}
+                  className={`p-6 rounded-lg text-left transition-all border-2 ${
+                    shouldShowCorrect
+                      ? 'bg-green-900 border-green-500 text-white'
+                      : shouldShowWrong
+                      ? 'bg-red-900 border-red-500 text-white'
+                      : showAnswer
+                      ? 'bg-gray-800 border-gray-700 text-gray-500'
+                      : 'bg-gray-800 border-gray-700 hover:border-green-500 hover:bg-gray-750 text-white'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <h3 className="font-bold text-lg mb-1">{pattern.name}</h3>
+                      <p className="text-sm text-gray-400 mb-1">
+                        {pattern.timeSignature} • {pattern.bpm} BPM
+                      </p>
+                      <p className="text-xs">{pattern.notation}</p>
+                    </div>
+                    {shouldShowCorrect && <div className="text-2xl">✓</div>}
+                    {shouldShowWrong && <div className="text-2xl">✗</div>}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Answer Feedback */}
+          {showAnswer && currentPattern && (
+            <div
+              className={`p-6 rounded-lg ${
+                selectedAnswer === currentPattern.name
+                  ? 'bg-green-900/50 border-2 border-green-500'
+                  : 'bg-red-900/50 border-2 border-red-500'
+              }`}
+            >
+              <div className="flex items-start justify-between gap-4 mb-4">
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
+                    {selectedAnswer === currentPattern.name ? (
+                      <>
+                        <Drum className="w-6 h-6" />
+                        Correct!
+                      </>
+                    ) : (
+                      '❌ Incorrect'
+                    )}
+                  </h3>
+                  <p className="text-gray-300 mb-2">
+                    <strong>Correct Answer:</strong> {currentPattern.name}
+                  </p>
+                  <p className="text-sm text-gray-400">{currentPattern.description}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
+                <div className="bg-gray-900/50 p-3 rounded">
+                  <span className="text-gray-400">Time Signature:</span>
+                  <span className="ml-2 font-mono text-blue-400">{currentPattern.timeSignature}</span>
+                </div>
+                <div className="bg-gray-900/50 p-3 rounded">
+                  <span className="text-gray-400">Notation:</span>
+                  <span className="ml-2 text-green-400">{currentPattern.notation}</span>
+                </div>
+              </div>
+
+              <button
+                onClick={nextQuestion}
+                className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-semibold transition-all"
+              >
+                Next Pattern →
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

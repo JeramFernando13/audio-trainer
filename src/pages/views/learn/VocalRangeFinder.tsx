@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from 'react';
-import { Mic, Save, TrendingUp, TrendingDown, Award, MicVocal, AlertCircle, History } from 'lucide-react';
+import { Mic, Save, TrendingUp, TrendingDown, Award, MicVocal, AlertCircle, History, Lightbulb } from 'lucide-react';
 import { usePitchDetection } from '../../../hooks/usePitchDetection';
 import { VOICE_TYPES, type VoiceType } from '../../../data/vocal';
 
@@ -246,16 +246,14 @@ export const VocalRangeFinder = () => {
               
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4 mb-6">
                 <div className="flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
-                  <div className="text-left">
-                    <p className="text-sm text-yellow-700 dark:text-yellow-300 mb-2">
-                      <strong>💡 Nuovo:</strong> Salvataggio automatico mentre canti!
-                    </p>
-                    <p className="text-xs text-yellow-600 dark:text-yellow-400">
-                      • Tieni il telefono a 30-50cm dalla bocca<br/>
-                      • Il range si aggiorna automaticamente mentre canti<br/>
-                      • Puoi vedere lo storico dei tuoi tentativi
-                    </p>
+                  <Lightbulb className="w-5 h-5 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
+                  <div className="text-left flex-1">
+                  
+                    <ul className="text-xs text-yellow-600 dark:text-yellow-400 space-y-1">
+                      <li>• Tieni il telefono a 30-50cm dalla bocca</li>
+                      <li>• Il range si aggiorna automaticamente mentre canti</li>
+                      <li>• Puoi vedere lo storico dei tuoi tentativi</li>
+                    </ul>
                   </div>
                 </div>
               </div>

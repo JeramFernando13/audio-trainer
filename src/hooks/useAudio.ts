@@ -1,71 +1,87 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import * as Tone from 'tone';
 
 export const useAudio = () => {
-  const [volume, setVolume] = useState(-12); // Default volume in dB
+  const [volume, setVolume] = useState(-12);
+  const isAudioStartedRef = useRef(false);
 
-  // Apply volume to all audio output
-  const applyVolume = useCallback(() => {
+  // ✅ Initialize audio context on first user interaction
+  const ensureAudioStarted = useCallback(async () => {
+    if (!isAudioStartedRef.current) {
+      await Tone.start();
+      isAudioStartedRef.current = true;
+    }
+    // Apply volume after audio is started
     Tone.Destination.volume.value = volume;
   }, [volume]);
 
   // Play a single note (for intervals, chords, vocal training)
-  const playNote = useCallback((frequency: number, duration: string = '4n') => {
-    applyVolume();
+  const playNote = useCallback(async (frequency: number, duration: string = '4n') => {
+    await ensureAudioStarted();
     const synth = new Tone.Synth().toDestination();
     synth.triggerAttackRelease(frequency, duration);
-  }, [applyVolume]);
+    
+    setTimeout(() => synth.dispose(), 2000);
+  }, [ensureAudioStarted]);
 
   // Play an interval (two notes)
-  const playInterval = useCallback((baseFreq: number, semitones: number, mode: 'harmonic' | 'melodic' = 'harmonic') => {
-    applyVolume();
+  const playInterval = useCallback(async (
+    baseFreq: number, 
+    semitones: number, 
+    mode: 'harmonic' | 'melodic' = 'harmonic'
+  ) => {
+    await ensureAudioStarted();
     const secondFreq = baseFreq * Math.pow(2, semitones / 12);
-    const synth = new Tone.Synth().toDestination();
 
     if (mode === 'harmonic') {
       // Play both notes together
-      synth.triggerAttackRelease(baseFreq, '1n');
-      const synth2 = new Tone.Synth().toDestination();
-      synth2.triggerAttackRelease(secondFreq, '1n');
+      const polySynth = new Tone.PolySynth(Tone.Synth).toDestination();
+      polySynth.triggerAttackRelease([baseFreq, secondFreq], '1n');
+      setTimeout(() => polySynth.dispose(), 2000);
     } else {
       // Play notes in sequence
-      synth.triggerAttackRelease(baseFreq, '4n', Tone.now());
+      const synth = new Tone.Synth().toDestination();
+      synth.triggerAttackRelease(baseFreq, '4n');
+      
       setTimeout(() => {
         const synth2 = new Tone.Synth().toDestination();
         synth2.triggerAttackRelease(secondFreq, '4n');
+        setTimeout(() => {
+          synth.dispose();
+          synth2.dispose();
+        }, 1000);
       }, 500);
     }
-  }, [applyVolume]);
+  }, [ensureAudioStarted]);
 
   // Play a chord (multiple notes)
-  const playChord = useCallback((
+  const playChord = useCallback(async (
     rootFreq: number, 
     intervals: number[], 
     mode: 'arpeggio' | 'block' = 'block'
   ) => {
-    applyVolume();
+    await ensureAudioStarted();
     const frequencies = intervals.map(interval => rootFreq * Math.pow(2, interval / 12));
 
     if (mode === 'block') {
-      // FIXED: Use PolySynth for perfect sync
       const polySynth = new Tone.PolySynth(Tone.Synth).toDestination();
       polySynth.triggerAttackRelease(frequencies, '1n');
-      
-      setTimeout(() => {
-        polySynth.dispose();
-      }, 2000);
+      setTimeout(() => polySynth.dispose(), 2000);
     } else {
-      // Play notes in sequence (arpeggio)
+      // Arpeggio
       frequencies.forEach((freq, index) => {
-        const synth = new Tone.Synth().toDestination();
-        synth.triggerAttackRelease(freq, '8n', Tone.now() + index * 0.2);
+        setTimeout(() => {
+          const synth = new Tone.Synth().toDestination();
+          synth.triggerAttackRelease(freq, '8n');
+          setTimeout(() => synth.dispose(), 500);
+        }, index * 200);
       });
     }
-  }, [applyVolume]);
+  }, [ensureAudioStarted]);
 
   // Play pink noise with frequency boost (for frequency training)
-  const playFrequencyBoosted = useCallback((frequency: number, duration: number = 3) => {
-    applyVolume();
+  const playFrequencyBoosted = useCallback(async (frequency: number, duration: number = 3) => {
+    await ensureAudioStarted();
     const noise = new Tone.Noise('pink').start();
     const filter = new Tone.Filter(frequency, 'bandpass', -24).toDestination();
     const gain = new Tone.Gain(0.3).connect(filter);
@@ -78,11 +94,11 @@ export const useAudio = () => {
       filter.dispose();
       gain.dispose();
     }, duration * 1000);
-  }, [applyVolume]);
+  }, [ensureAudioStarted]);
 
-  // Play pure sine wave at specific frequency (NEW for sine wave training)
-  const playSineWave = useCallback((frequency: number, duration: number = 2) => {
-    applyVolume();
+  // Play pure sine wave at specific frequency
+  const playSineWave = useCallback(async (frequency: number, duration: number = 2) => {
+    await ensureAudioStarted();
     const oscillator = new Tone.Oscillator({
       frequency: frequency,
       type: 'sine',
@@ -95,15 +111,15 @@ export const useAudio = () => {
       oscillator.stop();
       oscillator.dispose();
     }, duration * 1000);
-  }, [applyVolume]);
+  }, [ensureAudioStarted]);
 
-  // Play frequency sweep (chirp) - bonus for advanced training
-  const playFrequencySweep = useCallback((
+  // Play frequency sweep (chirp)
+  const playFrequencySweep = useCallback(async (
     startFreq: number, 
     endFreq: number, 
     duration: number = 3
   ) => {
-    applyVolume();
+    await ensureAudioStarted();
     const oscillator = new Tone.Oscillator({
       frequency: startFreq,
       type: 'sine',
@@ -117,43 +133,43 @@ export const useAudio = () => {
       oscillator.stop();
       oscillator.dispose();
     }, duration * 1000);
-  }, [applyVolume]);
+  }, [ensureAudioStarted]);
 
-  // Aggiungi questa funzione dentro il tuo hook useAudio
+  // Play scale
+  const playScale = useCallback(async (
+    intervals: number[],
+    direction: 'ascending' | 'descending' = 'ascending'
+  ): Promise<void> => {
+    await ensureAudioStarted();
+    const synth = new Tone.Synth().toDestination();
+    const baseFreq = 261.63; // C4
 
-const playScale = async (
-  intervals: number[],
-  direction: 'ascending' | 'descending' = 'ascending'
-): Promise<void> => {
-  const synth = new Tone.Synth().toDestination();
-  const baseFreq = 261.63; // C4
+    const frequencies = intervals.map((semitone) =>
+      baseFreq * Math.pow(2, semitone / 12)
+    );
 
-  const frequencies = intervals.map((semitone) =>
-    baseFreq * Math.pow(2, semitone / 12)
-  );
+    const playOrder = direction === 'descending' 
+      ? [...frequencies].reverse() 
+      : frequencies;
 
-  // Reverse if descending
-  const playOrder = direction === 'descending' 
-    ? [...frequencies].reverse() 
-    : frequencies;
+    const now = Tone.now();
+    playOrder.forEach((freq, index) => {
+      synth.triggerAttackRelease(freq, '8n', now + index * 0.3);
+    });
 
-  const now = Tone.now();
-  playOrder.forEach((freq, index) => {
-    synth.triggerAttackRelease(freq, '8n', now + index * 0.3);
-  });
+    await new Promise(resolve => 
+      setTimeout(resolve, playOrder.length * 300 + 500)
+    );
+    
+    synth.dispose();
+  }, [ensureAudioStarted]);
 
-  // Wait for scale to finish
-  await new Promise(resolve => 
-    setTimeout(resolve, playOrder.length * 300 + 500)
-  );
-  
-  synth.dispose();
-};
-
-  const playRhythm = async (
+  // Play rhythm pattern
+  const playRhythm = useCallback(async (
     pattern: number[],
     bpm: number
   ): Promise<void> => {
+    await ensureAudioStarted();
     const synth = new Tone.Synth({
       oscillator: { type: 'square' },
       envelope: {
@@ -164,16 +180,13 @@ const playScale = async (
       },
     }).toDestination();
 
-    // Set tempo
     Tone.getTransport().bpm.value = bpm;
 
-    // Convert 16th note durations to time
-    const sixteenthNote = 60 / bpm / 4; // Duration of one 16th note in seconds
-
+    const sixteenthNote = 60 / bpm / 4;
     let currentTime = 0;
     
     pattern.forEach((duration, index) => {
-      const isAccent = index === 0; // Accent first note
+      const isAccent = index === 0;
       const freq = isAccent ? 880 : 440;
       const noteTime = Tone.now() + currentTime;
       
@@ -182,13 +195,12 @@ const playScale = async (
       currentTime += duration * sixteenthNote;
     });
 
-    // Wait for pattern to finish
     await new Promise(resolve => 
       setTimeout(resolve, currentTime * 1000 + 500)
     );
 
     synth.dispose();
-  };
+  }, [ensureAudioStarted]);
 
   return {
     playNote,
@@ -197,9 +209,9 @@ const playScale = async (
     playFrequencyBoosted,
     playSineWave,
     playFrequencySweep,
-    volume,
-    setVolume,
     playScale,
     playRhythm,
+    volume,
+    setVolume,
   };
 };

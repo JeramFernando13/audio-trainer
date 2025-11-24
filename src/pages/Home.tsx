@@ -9,7 +9,7 @@ export const Home = () => {
       icon: AudioWaveform,
       path: '/sound-engineers',
       color: 'from-purple-500 to-violet-600',
-      features: ['Frequenze (Pink Noise)', 'Sine Wave Theory'],
+      features: ['EQ & Pink Noise', 'Sine Wave Theory'],
       tag: 'Sound Engineers',
     },
     {

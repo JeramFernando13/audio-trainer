@@ -1,4 +1,4 @@
-import { AudioLines, GraduationCap, Music, Piano, Sliders, Target, Waves, MicVocal, Speech } from "lucide-react";
+import { AudioLines, GraduationCap, Music, Piano, Sliders, Target, Waves, MicVocal, Speech, Music4 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Dropdown } from "../ui/Dropdown";
 import { VolumeController } from '../audio/VolumeController';
@@ -10,7 +10,7 @@ export const NavBar = () => {
     // Sound Engineering (Purple theme)
     { 
       path: '/learn/frequency', 
-      label: 'Frequenze (Pink Noise)', 
+      label: 'EQ & Pink Noise', 
       icon: Sliders,
       category: 'SE',
       color: 'text-purple-600 dark:text-purple-400'
@@ -75,7 +75,7 @@ export const NavBar = () => {
     // Sound Engineering (Purple theme)
     { 
       path: '/train/frequency', 
-      label: 'Frequency Quiz (Pink)', 
+      label: 'Pink Noise Quiz ', 
       icon: Sliders,
       category: 'SE',
       color: 'text-purple-600 dark:text-purple-400'
@@ -149,6 +149,15 @@ export const NavBar = () => {
 
           {/* Controls - Right side */}
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            {/* Metronome Button */}
+            <Link
+              to="/metronome"
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors group"
+              title="Metronome"
+            >
+              <Music4  className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors" />
+            </Link>
+
             {/* Volume Control */}
             <VolumeController />
             
