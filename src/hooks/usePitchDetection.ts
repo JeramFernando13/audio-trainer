@@ -40,9 +40,9 @@ export const usePitchDetection = () => {
     }
     rms = Math.sqrt(rms / buffer.length);
 
-    // CRITICAL: Soglia RMS più alta per evitare rumore di fondo
-    // 0.05 = circa -26dB, sotto questo è solo rumore
-    if (rms < 0.05) return -1;
+    // CRITICAL: Soglia RMS più bassa per rilevare da più lontano
+    // 0.01 = circa -40dB, permette rilevamento a distanza maggiore
+    if (rms < 0.02) return -1;
 
     // Autocorrelation - FIXED: algoritmo corretto
     let bestOffset = -1;
