@@ -40,8 +40,14 @@ export const usePitchDetection = () => {
     }
     rms = Math.sqrt(rms / buffer.length);
 
-    // CRITICAL: Soglia RMS più bassa per rilevare da più lontano
-    // 0.01 = circa -40dB, permette rilevamento a distanza maggiore
+    // DEBUG: Log RMS per capire livello audio
+    if (rms > 0.001) {
+      console.log('RMS Level:', rms.toFixed(4), 'Threshold: 0.02');
+    }
+
+    // CRITICAL: Soglia RMS bilanciata per rilevare voce a distanza media
+    // 0.02 = circa -34dB, buon compromesso tra sensibilità e rumore
+    // Puoi cantare a 30-50cm dal microfono
     if (rms < 0.02) return -1;
 
     // Autocorrelation - FIXED: algoritmo corretto
@@ -188,8 +194,13 @@ export const usePitchDetection = () => {
       analyser.smoothingTimeConstant = 0.3; // REDUCED: Meno smoothing = più reattivo
       analyserRef.current = analyser;
 
+      // ADD GAIN NODE: Amplifica input microfono per rilevare da più lontano
+      const gainNode = audioContext.createGain();
+      gainNode.gain.value = 3.0; // 3x amplificazione = rileva da 50-100cm
+
       const source = audioContext.createMediaStreamSource(stream);
-      source.connect(analyser);
+      source.connect(gainNode); // Mic → Gain
+      gainNode.connect(analyser); // Gain → Analyser
 
       setIsListening(true);
       
