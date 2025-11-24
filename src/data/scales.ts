@@ -15,6 +15,8 @@ export interface Scale {
   difficulty: 'easy' | 'medium' | 'hard' | 'pro';
 }
 
+
+
 export const SCALES_GUIDE: Scale[] = [
   // ============================================
   // FOUNDATIONAL SCALES
@@ -382,6 +384,16 @@ export const SCALES_GUIDE: Scale[] = [
   },
 ];
 
+
+export interface VocalDifficultyConfig {
+  scales: string[];
+  direction: string;
+  timeLimit: number | null;
+  showHints: boolean;
+  label: string;
+  description: string;
+
+}
 // Difficulty configuration for training
 export const SCALES_DIFFICULTY_CONFIG = {
   easy: {
@@ -389,7 +401,7 @@ export const SCALES_DIFFICULTY_CONFIG = {
     direction: 'ascending',
     timeLimit: null,
     showHints: true,
-    label: 'Easy 🟢',
+    label: 'Easy',
     description: 'Basic scales: Major, Minor, Pentatonics (ascending only)',
   },
   medium: {
@@ -406,7 +418,7 @@ export const SCALES_DIFFICULTY_CONFIG = {
     direction: 'both',
     timeLimit: 20,
     showHints: true,
-    label: 'Medium 🟡',
+    label: 'Medium',
     description: 'Main modes + pentatonics + blues (both directions)',
   },
   hard: {
@@ -429,7 +441,7 @@ export const SCALES_DIFFICULTY_CONFIG = {
     direction: 'both',
     timeLimit: 15,
     showHints: false,
-    label: 'Hard 🟠',
+    label: 'Hard',
     description: 'All modes + jazz bebop scales',
   },
   pro: {
@@ -437,7 +449,8 @@ export const SCALES_DIFFICULTY_CONFIG = {
     direction: 'both',
     timeLimit: 10,
     showHints: false,
-    label: 'Pro 🔴',
+    label: 'Pro ',
     description: 'All scales including exotic & altered (blind mode)',
   },
 };
+

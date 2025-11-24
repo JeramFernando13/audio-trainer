@@ -179,7 +179,7 @@ export const FrequencyTraining = () => {
         <div className="flex gap-4 mb-6">
           <button
             onClick={generateNewFrequency}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg"
+            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg"
           >
             <Play className="w-5 h-5" />
             {currentFreqIndex === null ? 'Start Quiz' : 'Next Question'}
@@ -246,9 +246,9 @@ export const FrequencyTraining = () => {
 
         {/* Tips */}
         {currentFreqIndex === null && (
-          <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl">
+          <div className="mt-8 bg-purple-50 dark:bg-purple-900/20 p-6 rounded-xl">
             <div className="flex items-start gap-3">
-              <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-1 shrink-0" />
+              <TrendingUp className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-1 shrink-0" />
               <div className="text-sm text-gray-700 dark:text-gray-300">
                 <strong className="block mb-2">Tips per progredire:</strong>
                 <ul className="space-y-1 list-disc list-inside">

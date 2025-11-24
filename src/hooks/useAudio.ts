@@ -150,6 +150,46 @@ const playScale = async (
   synth.dispose();
 };
 
+  const playRhythm = async (
+    pattern: number[],
+    bpm: number
+  ): Promise<void> => {
+    const synth = new Tone.Synth({
+      oscillator: { type: 'square' },
+      envelope: {
+        attack: 0.001,
+        decay: 0.05,
+        sustain: 0,
+        release: 0.05,
+      },
+    }).toDestination();
+
+    // Set tempo
+    Tone.getTransport().bpm.value = bpm;
+
+    // Convert 16th note durations to time
+    const sixteenthNote = 60 / bpm / 4; // Duration of one 16th note in seconds
+
+    let currentTime = 0;
+    
+    pattern.forEach((duration, index) => {
+      const isAccent = index === 0; // Accent first note
+      const freq = isAccent ? 880 : 440;
+      const noteTime = Tone.now() + currentTime;
+      
+      synth.triggerAttackRelease(freq, '32n', noteTime);
+      
+      currentTime += duration * sixteenthNote;
+    });
+
+    // Wait for pattern to finish
+    await new Promise(resolve => 
+      setTimeout(resolve, currentTime * 1000 + 500)
+    );
+
+    synth.dispose();
+  };
+
   return {
     playNote,
     playInterval,
@@ -160,5 +200,6 @@ const playScale = async (
     volume,
     setVolume,
     playScale,
+    playRhythm,
   };
 };

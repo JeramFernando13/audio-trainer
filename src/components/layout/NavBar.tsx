@@ -38,13 +38,20 @@ export const NavBar = () => {
       category: 'Musician',
       color: 'text-blue-600 dark:text-blue-400'
     },
-        { 
+    { 
       path: '/learn/scales', 
       label: 'Scale', 
       icon: Piano,
       category: 'Musician',
       color: 'text-blue-600 dark:text-blue-400'
     },
+    { 
+      path: '/learn/rhythm', 
+      label: 'Rhythm', 
+      icon: Piano,
+      category: 'Musician',
+      color: 'text-blue-600 dark:text-blue-400'
+    },    
     
     // Vocalists (Green theme)
     { 
@@ -103,6 +110,14 @@ export const NavBar = () => {
       category: 'Musician',
       color: 'text-blue-600 dark:text-blue-400'
     },
+    { 
+      path: '/train/rhythm', 
+      label: 'Rhythm Quiz', 
+      icon: Piano,
+      category: 'Musician',
+      color: 'text-blue-600 dark:text-blue-400'
+    },
+    
     
     // Vocalists (Green theme)
     { 
@@ -114,34 +129,29 @@ export const NavBar = () => {
     },
   ];
 
-  // Convert dB (-40 to 0) to percentage (0% to 100%)
-
   return (
     <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <AudioLines className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-            <h1 className="hidden md:flex text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group shrink-0">
+            <AudioLines className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
+            <h1 className="hidden md:block text-lg sm:text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
               Audio Trainer
             </h1>
           </Link>
           
           {/* Navigation Dropdowns */}
-          <div className="flex items-center gap-2">
-            <div className="ml-4 sm:ml-0">
-              <Dropdown label="Learn" icon={GraduationCap} items={learnItems} />
-            </div>
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Dropdown label="Learn" icon={GraduationCap} items={learnItems} />
             <Dropdown label="Train" icon={Target} items={trainItems} />
           </div>
 
-          {/* Controls */}
-          <div className="flex items-center gap-4">
+          {/* Controls - Right side */}
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             {/* Volume Control */}
             <VolumeController />
             
-
             {/* Theme Toggle */}
             {/* <ThemeToggle /> */}
           </div>

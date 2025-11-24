@@ -209,7 +209,7 @@ export const VocalTraining = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center justify-center gap-2">
-            <MicVocal className="w-7 h-7" />
+            <MicVocal className="w-6 md:w-8 h-6 md:h-8 text-green-600 dark:text-green-400" />
             Vocal Training
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
@@ -406,9 +406,9 @@ export const VocalTraining = () => {
 
         {/* Tips */}
         {currentNoteIndex === null && (
-          <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl">
+          <div className="mt-8 bg-green-50 dark:bg-green-900/20 p-6 rounded-xl">
             <div className="flex items-start gap-3">
-              <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-1 shrink-0" />
+              <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400 mt-1 shrink-0" />
               <div className="text-sm text-gray-700 dark:text-gray-300">
                 <strong className="block mb-2">Come funziona:</strong>
                 <ol className="space-y-1 list-decimal list-inside">

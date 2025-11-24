@@ -1,5 +1,7 @@
 // Centralized difficulty configuration for all training modules
 
+import { SCALES_GUIDE } from "./scales";
+
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'pro';
 
 export interface DifficultyMeta {
@@ -293,6 +295,75 @@ export const VOCAL_DIFFICULTY_CONFIG: Record<Difficulty, VocalDifficultyConfig> 
     allowance: 20,
     description: '15 note - 8 secondi - Full range (F3-F5) - Blind mode - Precisione massima'
   }
+};
+
+export interface ScalesDifficultyConfig {
+  scales: string[];
+  direction: string;
+  timeLimit: number | null;
+  showHints: boolean;
+  label: string;
+  description: string;
+
+}
+// Difficulty configuration for training
+export const SCALES_DIFFICULTY_CONFIG: Record<Difficulty, ScalesDifficultyConfig> = {
+  easy: {
+    scales: ['Major (Ionian)', 'Natural Minor (Aeolian)', 'Major Pentatonic', 'Minor Pentatonic'],
+    direction: 'ascending',
+    timeLimit: null,
+    showHints: true,
+    label: 'Easy',
+    description: 'Basic scales: Major, Minor, Pentatonics (ascending only)',
+  },
+  medium: {
+    scales: [
+      'Major (Ionian)',
+      'Natural Minor (Aeolian)',
+      'Dorian',
+      'Mixolydian',
+      'Phrygian',
+      'Major Pentatonic',
+      'Minor Pentatonic',
+      'Blues Scale',
+    ],
+    direction: 'both',
+    timeLimit: 20,
+    showHints: true,
+    label: 'Medium',
+    description: 'Main modes + pentatonics + blues (both directions)',
+  },
+  hard: {
+    scales: [
+      'Major (Ionian)',
+      'Natural Minor (Aeolian)',
+      'Harmonic Minor',
+      'Melodic Minor',
+      'Dorian',
+      'Phrygian',
+      'Lydian',
+      'Mixolydian',
+      'Locrian',
+      'Major Pentatonic',
+      'Minor Pentatonic',
+      'Blues Scale',
+      'Bebop Dominant',
+      'Lydian Dominant',
+    ],
+    direction: 'both',
+    timeLimit: 15,
+    showHints: false,
+    label: 'Hard',
+    description: 'All modes + jazz bebop scales',
+  },
+  pro: {
+    scales: SCALES_GUIDE.map((s) => s.name), // ALL scales
+    direction: 'both',
+    timeLimit: 10,
+    showHints: false,
+    label: 'Pro ',
+    description: 'All scales including exotic & altered (blind mode)',
+  },
 };
 
 // ============================================

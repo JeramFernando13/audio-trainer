@@ -31,6 +31,8 @@ import { VocalTraining } from './pages/views/training/VocalTraining';
 import { Musicians } from './pages/categories/Musicians';
 import { Singers } from './pages/categories/Singers';
 import { SoundEngineers } from './pages/categories/SoundEngineers';
+import { RhythmLearn } from './pages/views/learn/RhythmLearn';
+import { RhythmTraining } from './pages/views/training/RhythmTraining';
 
 function App() {
   return (
@@ -53,6 +55,8 @@ function App() {
               <Route path="/learn/intervals" element={<IntervalsLearn />} />
               <Route path="/learn/chords" element={<ChordsLearn />} />
              <Route path="/learn/scales" element={<ScalesLearn />} />
+             <Route path="/learn/rhythm" element={<RhythmLearn />} />
+             
 
               <Route path="/learn/vocal" element={<VocalLearn />} />
               <Route path="/learn/vocal-range" element={<VocalRangeFinder />} />
@@ -64,6 +68,7 @@ function App() {
               <Route path="/train/intervals" element={<IntervalTraining />} />
               <Route path="/train/chords" element={<ChordsTraining />} />
               <Route path="/train/scales" element={<ScalesTraining />} />
+              <Route path="/train/rhythm" element={<RhythmTraining />} />
               
               
               <Route path="/train/vocal" element={<VocalTraining />} />

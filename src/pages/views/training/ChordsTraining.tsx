@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Play, RotateCcw, Volume2, Clock, TrendingUp } from 'lucide-react';
+import { Play, RotateCcw, Volume2, Clock, TrendingUp, Piano } from 'lucide-react';
 import { useAudio } from '../../../hooks/useAudio';
 import { useStats } from '../../../hooks/useStats';
 import { DifficultySelector } from '../../../components/ui/DifficultySelector';
@@ -141,9 +141,12 @@ export const ChordsTraining = () => {
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
         {/* Header */}
         <div className="text-center mb-8">
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <Piano className="w-6 md:w-8 h-6 md:h-8 text-blue-600 dark:text-blue-400" />
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Chords Training
           </h1>
+        </div>
           <p className="text-gray-600 dark:text-gray-400">
             Riconosci il tipo di accordo
           </p>

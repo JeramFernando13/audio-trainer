@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 
 type Difficulty = 'easy' | 'medium' | 'hard' | 'pro';
-type QuizType = 'frequency' | 'intervals' | 'chords' | 'sinewave' | 'vocal';
+type QuizType = 'frequency' | 'intervals' | 'chords' | 'sinewave' | 'vocal' | 'scales' | 'rhythm';
 
 interface DifficultyStats {
   correct: number;
@@ -24,6 +24,8 @@ interface AllStats {
   chords: QuizStats;
   sinewave: QuizStats;
   vocal: QuizStats;
+  scales: QuizStats;
+  rhythm: QuizStats;
   totalQuizzes: number;
   lastSession: string;
 }
@@ -50,6 +52,8 @@ const initialStats: AllStats = {
   chords: { ...initialQuizStats },
   sinewave: { ...initialQuizStats },
   vocal: { ...initialQuizStats },
+  scales: { ...initialQuizStats },
+  rhythm: { ...initialQuizStats },
   totalQuizzes: 0,
   lastSession: '',
 };
@@ -71,12 +75,14 @@ export const useStats = () => {
           ...parsed,
           sinewave: parsed.sinewave || initialQuizStats,
           vocal: parsed.vocal || initialQuizStats,
+          scales: parsed.scales || initialQuizStats,
+          rhythm: parsed.rhythm || initialQuizStats,
         };
         
         setStats(migratedStats);
         
         // Save migrated stats back to localStorage
-        if (!parsed.sinewave || !parsed.vocal) {
+        if (!parsed.sinewave || !parsed.vocal || !parsed.scales || !parsed.rhythm) {
           localStorage.setItem(STATS_KEY, JSON.stringify(migratedStats));
         }
       } catch (error) {

@@ -1,6 +1,6 @@
 import { Trophy, TrendingUp, Target, Flame, Calendar } from 'lucide-react';
 
-type QuizType = 'frequency' | 'intervals' | 'chords' | 'vocal' | 'sinewave';
+type QuizType = 'frequency' | 'intervals' | 'chords' | 'vocal' | 'sinewave' | 'scales'| 'rhythm';
 
 interface StatsPanelProps {
   quizType: QuizType;
