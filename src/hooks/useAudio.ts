@@ -15,6 +15,39 @@ export const useAudio = () => {
     Tone.Destination.volume.value = volume;
   }, [volume]);
 
+  // Add this to your useAudio.ts hook
+
+  // Play pink noise with EQ boost at specific frequency
+  const playPinkNoise = useCallback(async (
+    centerFreq: number,
+    duration: number = 3
+  ): Promise<void> => {
+    await ensureAudioStarted();
+
+    // Create pink noise using multiple sine waves
+    const noise = new Tone.Noise('pink').start();
+    
+    // Create EQ filter centered at the target frequency
+    const filter = new Tone.Filter({
+      type: 'bandpass',
+      frequency: centerFreq,
+      Q: 2, // Narrow boost for clear identification
+      gain: 12 // +12dB boost
+    }).toDestination();
+
+    // Route noise through filter
+    noise.connect(filter);
+
+    // Play for specified duration
+    await new Promise(resolve => setTimeout(resolve, duration * 1000));
+
+    // Cleanup
+    noise.stop();
+    noise.dispose();
+    filter.dispose();
+  }, [ensureAudioStarted]);
+
+
   // Play a single note (for intervals, chords, vocal training)
   const playNote = useCallback(async (frequency: number, duration: string = '4n') => {
     await ensureAudioStarted();
@@ -167,9 +200,19 @@ export const useAudio = () => {
   // Play rhythm pattern
   const playRhythm = useCallback(async (
     pattern: number[],
-    bpm: number
+    bpm: number,
+    bars: number = 4
   ): Promise<void> => {
-    await ensureAudioStarted();
+    // Assicurati che Tone.js sia avviato PRIMA di creare synth
+    if (Tone.context.state !== 'running') {
+      await Tone.start();
+      // Piccolo delay per evitare il click iniziale
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    // Ripeti il pattern per N battute
+    const fullPattern = Array(bars).fill(pattern).flat();
+    
     const synth = new Tone.Synth({
       oscillator: { type: 'square' },
       envelope: {
@@ -185,10 +228,14 @@ export const useAudio = () => {
     const sixteenthNote = 60 / bpm / 4;
     let currentTime = 0;
     
-    pattern.forEach((duration, index) => {
-      const isAccent = index === 0;
-      const freq = isAccent ? 880 : 440;
-      const noteTime = Tone.now() + currentTime;
+    fullPattern.forEach((duration,) => {
+      // Accento ogni battuta (ogni 16 sedicesimi)
+      // const positionInBar = index % 16;
+      // const isDownbeat = positionInBar === 0;
+      
+      const freq = 523.25;
+      // Aggiungi un piccolo offset per evitare click all'inizio
+      const noteTime = Tone.now() + currentTime + 0.05; // 50ms offset
       
       synth.triggerAttackRelease(freq, '32n', noteTime);
       
@@ -200,9 +247,10 @@ export const useAudio = () => {
     );
 
     synth.dispose();
-  }, [ensureAudioStarted]);
+  }, []);
 
   return {
+    playPinkNoise,
     playNote,
     playInterval,
     playChord,

@@ -75,14 +75,14 @@ export const VolumeController = () => {
         {/* Mute Button */}
         <button
           onClick={toggleMute}
-          className="p-1.5 md:p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors shrink-0"
+          className="p-1.5  rounded-lg transition-colors shrink-0"
           title={isMuted ? 'Unmute' : 'Mute'}
           aria-label={isMuted ? 'Unmute' : 'Mute'}
         >
           {isMuted ? (
-            <VolumeX className="w-4 h-4 md:w-5 md:h-5 text-gray-600 dark:text-gray-400" />
+            <VolumeX className="w-4 h-4 md:w-5 md:h-5 hover:text-blue-600 dark:hover:text-blue-500 text-gray-600 dark:text-gray-400" />
           ) : (
-            <Volume2 className="w-4 h-4 md:w-5 md:h-5 text-gray-600 dark:text-gray-400" />
+            <Volume2 className="w-4 h-4 md:w-5 md:h-5 hover:text-blue-600 dark:hover:text-blue-500 text-gray-600 dark:text-gray-400" />
           )}
         </button>
 

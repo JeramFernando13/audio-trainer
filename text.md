@@ -1,7 +1,7 @@
 # problemi o fix da fare
 
-- dopo un pò la scale training page crussha, poi dovremmo adattare lo stile come nelle altre pagine tipo con difficult selector e stats
-- le pagine rhythm sono da rivedere perchè non vanno
+- il tutto no è ben simmetrico (non si centra bene ) sia che in nav che componente centrale
+- far in omodo che rhythm difficuty config si adattato nel file difficult.ts
 
 - e se possiamo aumentare professionalita
 - e più teoria nel learn che dici?

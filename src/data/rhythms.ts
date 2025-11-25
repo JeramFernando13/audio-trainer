@@ -263,50 +263,6 @@ export const RHYTHM_PATTERNS: RhythmPattern[] = [
   },
 ];
 
-// Difficulty configuration for training
-export const RHYTHM_DIFFICULTY_CONFIG = {
-  easy: {
-    patterns: RHYTHM_PATTERNS.filter(p => p.difficulty === 'easy').map(p => p.name),
-    bpm: 80,
-    showMetronome: true,
-    showVisual: true,
-    timeLimit: null,
-    label: 'Easy 🟢',
-    description: 'Basic note values in 4/4 time',
-  },
-  medium: {
-    patterns: RHYTHM_PATTERNS.filter(p => 
-      p.difficulty === 'easy' || p.difficulty === 'medium'
-    ).map(p => p.name),
-    bpm: 100,
-    showMetronome: true,
-    showVisual: true,
-    timeLimit: 20,
-    label: 'Medium 🟡',
-    description: 'Syncopation and basic variations',
-  },
-  hard: {
-    patterns: RHYTHM_PATTERNS.filter(p => 
-      p.difficulty === 'easy' || p.difficulty === 'medium' || p.difficulty === 'hard'
-    ).map(p => p.name),
-    bpm: 110,
-    showMetronome: true,
-    showVisual: false,
-    timeLimit: 15,
-    label: 'Hard 🟠',
-    description: 'Triplets, sixteenths, and complex patterns',
-  },
-  pro: {
-    patterns: RHYTHM_PATTERNS.map(p => p.name), // ALL patterns
-    bpm: 120,
-    showMetronome: false,
-    showVisual: false,
-    timeLimit: 10,
-    label: 'Pro 🔴',
-    description: 'Polyrhythms and odd time signatures (blind mode)',
-  },
-};
-
 // Time signatures info
 export const TIME_SIGNATURES = [
   {

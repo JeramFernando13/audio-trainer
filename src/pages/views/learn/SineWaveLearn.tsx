@@ -58,9 +58,9 @@ export const SineWaveLearn = () => {
   return (
     <div className="space-y-6">
       {/* Header introduttivo */}
-      <div className="bg-linear-to-r from-blue-600 to-cyan-600 rounded-xl p-8 text-white">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
         <div className="flex items-center gap-3 mb-3">
-          <Waves className="w-10 h-10" />
+          <Waves className="w-10 h-10  text-blue-600 dark:text-blue-400" />
           <h1 className="text-4xl font-bold">Sine Wave Training</h1>
         </div>
         <p className="text-blue-100 text-lg max-w-3xl">

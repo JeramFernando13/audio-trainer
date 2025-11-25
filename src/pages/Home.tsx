@@ -50,11 +50,11 @@ export const Home = () => {
           Allena il tuo orecchio per musica e sound engineering con esercizi interattivi e progressivi.
         </p>
         <div className="flex gap-4 justify-center pt-4">
-          <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
+          <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
             <Sliders className="w-4 h-4" />
             Per Sound Engineers
           </div>
-          <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
+          <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
             <Music className="w-4 h-4" />
             Per Musicisti
           </div>
@@ -94,18 +94,13 @@ export const Home = () => {
                 {/* Content */}
                 <div className="p-6 space-y-4">
                   <div className="flex items-start justify-between">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
-                      {section.title}
-                    </h3>
+                    <h5 className="text-s font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
+                      {section.description}
+                    </h5>
                     <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full">
                       {section.tag}
                     </span>
                   </div>
-
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">
-                    {section.description}
-                  </p>
-
                   <ul className="space-y-2">
                     {section.features.map((feature, i) => (
                       <li key={i} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
