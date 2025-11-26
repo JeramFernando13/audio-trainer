@@ -221,6 +221,7 @@ export interface VocalDifficultyConfig {
   showNoteName: boolean;
   allowance: number;
   description: string;
+  label: string;
 }
 
 export const VOCAL_DIFFICULTY_CONFIG: Record<Difficulty, VocalDifficultyConfig> = {
@@ -235,7 +236,8 @@ export const VOCAL_DIFFICULTY_CONFIG: Record<Difficulty, VocalDifficultyConfig> 
     timeLimit: null,
     showNoteName: true,
     allowance: 50,
-    description: '5 note centrali - Nessun limite - Range ristretto (C4-A4)'
+    description: '5 note centrali - Nessun limite - Range ristretto (C4-A4)',
+    label: 'Easy',
   },
   medium: {
     notes: [
@@ -250,7 +252,8 @@ export const VOCAL_DIFFICULTY_CONFIG: Record<Difficulty, VocalDifficultyConfig> 
     timeLimit: 15,
     showNoteName: true,
     allowance: 40,
-    description: '7 note - 15 secondi - Range medio (C4-B4)'
+    description: '7 note - 15 secondi - Range medio (C4-B4)',
+    label: 'Medium',
   },
   hard: {
     notes: [
@@ -270,7 +273,8 @@ export const VOCAL_DIFFICULTY_CONFIG: Record<Difficulty, VocalDifficultyConfig> 
     timeLimit: 10,
     showNoteName: true,
     allowance: 30,
-    description: '12 note - 10 secondi - Range esteso (G3-E5) - Salti d\'ottava'
+    description: '12 note - 10 secondi - Range esteso (G3-E5) - Salti d\'ottava',
+    label:'Hard',
   },
   pro: {
     notes: [
@@ -293,7 +297,8 @@ export const VOCAL_DIFFICULTY_CONFIG: Record<Difficulty, VocalDifficultyConfig> 
     timeLimit: 8,
     showNoteName: false,
     allowance: 20,
-    description: '15 note - 8 secondi - Full range (F3-F5) - Blind mode - Precisione massima'
+    description: '15 note - 8 secondi - Full range (F3-F5) - Blind mode - Precisione massima',
+    label:'Pro'
   }
 };
 
@@ -422,8 +427,102 @@ export const RHYTHM_DIFFICULTY_CONFIG: Record<Difficulty, RhythmDifficultyConfig
 };
 
 // ============================================
+// SINE WAVE TRAINING CONFIGURATION
+// ============================================
+// Add/Replace this section in your difficulty.ts file
+
+export interface SineWaveBand {
+  freq: number;
+  name: string;
+  note?: string;
+}
+
+export interface SineWaveDifficultyConfig {
+  bands: SineWaveBand[];
+  timeLimit: number | null;
+  showFrequency: boolean;  // ← AGGIUNGI PER BLIND MODE
+  label: string;
+  description: string;
+}
+
+export const SINEWAVE_DIFFICULTY_CONFIG: Record<Difficulty, SineWaveDifficultyConfig> = {
+  easy: {
+    bands: [
+      { freq: 100, name: 'Bass', note: 'G2' },
+      { freq: 440, name: 'Mid', note: 'A4' },
+      { freq: 1000, name: 'Upper Mid', note: 'B5' },
+      { freq: 5000, name: 'Presence', note: 'D#8' },
+    ],
+    timeLimit: null,
+    showFrequency: true,  // ← Mostra frequenza
+    label: 'Easy',
+    description: '4 opzioni • Nessun limite',
+  },
+  medium: {
+    bands: [
+      { freq: 60, name: 'Sub Bass', note: 'B1' },
+      { freq: 120, name: 'Bass', note: 'B2' },
+      { freq: 240, name: 'Low Mid', note: 'B3' },
+      { freq: 500, name: 'Mid', note: 'B4' },
+      { freq: 1000, name: 'Upper Mid', note: 'B5' },
+      { freq: 2000, name: 'High Mid', note: 'B6' },
+      { freq: 4000, name: 'Presence', note: 'B7' },
+      { freq: 8000, name: 'Brilliance', note: 'B8' },
+    ],
+    timeLimit: 15,
+    showFrequency: true,  // ← Mostra frequenza
+    label: 'Medium',
+    description: '8 opzioni • 15 secondi',
+  },
+  hard: {
+    bands: [
+      { freq: 40, name: 'Deep Sub' },
+      { freq: 80, name: 'Sub Bass' },
+      { freq: 150, name: 'Bass' },
+      { freq: 250, name: 'Low Mid' },
+      { freq: 500, name: 'Mid' },
+      { freq: 1000, name: 'Upper Mid' },
+      { freq: 2000, name: 'High Mid' },
+      { freq: 3000, name: 'Presence' },
+      { freq: 5000, name: 'High Presence' },
+      { freq: 8000, name: 'Brilliance' },
+      { freq: 12000, name: 'Air' },
+      { freq: 16000, name: 'Ultra Air' },
+    ],
+    timeLimit: 10,
+    showFrequency: true,  // ← Mostra frequenza
+    label: 'Hard',
+    description: '12 opzioni • 10 secondi (40Hz-16kHz)',
+  },
+  pro: {
+    bands: [
+      { freq: 20, name: 'Infra Sub' },
+      { freq: 31.5, name: 'Deep Sub' },
+      { freq: 63, name: 'Sub Bass' },
+      { freq: 125, name: 'Bass' },
+      { freq: 250, name: 'Low Mid' },
+      { freq: 500, name: 'Mid' },
+      { freq: 1000, name: 'Upper Mid' },
+      { freq: 2000, name: 'High Mid' },
+      { freq: 4000, name: 'Presence' },
+      { freq: 8000, name: 'Brilliance' },
+      { freq: 12000, name: 'Air' },
+      { freq: 16000, name: 'Ultra Air' },
+      { freq: 20000, name: 'Extreme High' },
+    ],
+    timeLimit: 8,
+    showFrequency: false,  // ← BLIND MODE! Nasconde Hz
+    label: 'Pro',
+    description: '13 opzioni • 8 secondi • Blind mode (solo nomi)',
+  }
+};
+
+// ============================================
 // HELPER FUNCTIONS
 // ============================================
+
+
+
 
 export const getDifficultyLabel = (difficulty: Difficulty): string => {
   return DIFFICULTY_META[difficulty].label;

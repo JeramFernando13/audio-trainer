@@ -1,4 +1,4 @@
-import { AudioLines, GraduationCap, Music, Piano, Sliders, Target, Waves, MicVocal, Speech, Drum } from "lucide-react";
+import { AudioLines, GraduationCap, Music, Piano, Sliders, Target, Waves, MicVocal, Speech, Drum, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Dropdown } from "../ui/Dropdown";
 import { VolumeController } from '../audio/VolumeController';
@@ -43,7 +43,7 @@ export const NavBar = () => {
     { 
       path: '/learn/scales', 
       label: 'Scale', 
-      icon: Piano,
+      icon: TrendingUp,
       category: 'Musician',
       color: 'text-blue-600 dark:text-blue-400'
     },
@@ -108,7 +108,7 @@ export const NavBar = () => {
     { 
       path: '/train/scales', 
       label: 'Scale Quiz', 
-      icon: Piano,
+      icon: TrendingUp,
       category: 'Musician',
       color: 'text-blue-600 dark:text-blue-400'
     },

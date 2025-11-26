@@ -1,308 +1,62 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect, useCallback } from 'react';
-import { Play, RotateCcw, Volume2, Clock, TrendingUp, Piano } from 'lucide-react'; 
+import { TrendingUp } from 'lucide-react';
+import { GenericTraining } from '../../../components/training/GenericTraining';
+import type { TrainingQuestion } from '../../../components/training/GenericTraining';
 import { useAudio } from '../../../hooks/useAudio';
-import { useStats } from '../../../hooks/useStats';
-import { DifficultySelector } from '../../../components/ui/DifficultySelector';
-import { StatsPanel } from '../../../components/ui/StatsPanel';
-import { SCALES_GUIDE, SCALES_DIFFICULTY_CONFIG, type Scale } from '../../../data/scales';
-import { type Difficulty } from '../../../data/difficulty';
+import { SCALES_GUIDE } from '../../../data/scales';
+import { SCALES_DIFFICULTY_CONFIG, getDifficultyColor } from '../../../data/difficulty';
 
 export const ScalesTraining = () => {
   const { playScale } = useAudio();
-  const {
-    currentStreak,
-    recordAnswer,
-    resetStreak,
-    getStats,
-    getOverallAccuracy,
-  } = useStats();
 
-  const [difficulty, setDifficulty] = useState<Difficulty>('easy');
-  const [currentScaleIndex, setCurrentScaleIndex] = useState<number | null>(null);
-  const [options, setOptions] = useState<Scale[]>([]);
-  const [score, setScore] = useState({ correct: 0, total: 0 });
-  const [feedback, setFeedback] = useState<string>('');
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [timeLeft, setTimeLeft] = useState<number | null>(null);
-  const [playDirection, setPlayDirection] = useState<'ascending' | 'descending'>('ascending');
+  const getDifficultyColorWrapper = (key: string) => {
+    return getDifficultyColor(key as 'easy' | 'medium' | 'hard' | 'pro');
+  };
 
-  const config = SCALES_DIFFICULTY_CONFIG[difficulty];
-  const availableScales = SCALES_GUIDE.filter((scale) => config.scales.includes(scale.name));
-  const savedStats = getStats('scales', difficulty);
+  // Convert SCALES_GUIDE to TrainingQuestion format
+  const questions: TrainingQuestion[] = SCALES_GUIDE.map((scale) => ({
+    id: scale.name,
+    name: scale.name,
+    description: scale.description,
+    category: scale.name, // Use name as category for filtering
+    _original: scale,
+  }));
 
-  const handleTimeout = useCallback(() => {
-    if (currentScaleIndex === null) return;
-    setScore((prev) => ({ ...prev, total: prev.total + 1 }));
-    recordAnswer('scales' as any, difficulty, false);
-    setFeedback(`⏰ Tempo scaduto! Era: ${options[currentScaleIndex].name}`);
-    setShowAnswer(true);
-  }, [currentScaleIndex, options, recordAnswer, difficulty]);
-
-  // Timer logic
-  useEffect(() => {
-    if (timeLeft === null || timeLeft <= 0 || showAnswer) return;
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev === null || prev <= 1) {
-          handleTimeout();
-          return null;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [timeLeft, showAnswer, handleTimeout]);
-
-  const generateNewScale = () => {
-    if (availableScales.length < 4) return;
-
-    // Random direction
-    const direction = config.direction === 'both' 
-      ? (Math.random() > 0.5 ? 'ascending' : 'descending')
-      : 'ascending';
-    setPlayDirection(direction);
-
-    // Pick random correct scale
-    const correctIndex = Math.floor(Math.random() * availableScales.length);
-    const correct = availableScales[correctIndex];
-
-    // Generate 3 wrong options
-    const wrongOptions: Scale[] = [];
-    const otherScales = availableScales.filter((s) => s.name !== correct.name);
-
-    while (wrongOptions.length < 3 && otherScales.length > 0) {
-      const randomIndex = Math.floor(Math.random() * otherScales.length);
-      const scale = otherScales.splice(randomIndex, 1)[0];
-      wrongOptions.push(scale);
+  const handlePlay = async (question: TrainingQuestion) => {
+    if (!playScale) {
+      console.error('playScale is not available');
+      return;
     }
-
-    // Shuffle all options
-    const allOptions = [correct, ...wrongOptions].sort(() => Math.random() - 0.5);
-    const correctIndexInOptions = allOptions.findIndex(s => s.name === correct.name);
-
-    setCurrentScaleIndex(correctIndexInOptions);
-    setOptions(allOptions);
-    setFeedback('');
-    setShowAnswer(false);
-    setTimeLeft(config.timeLimit);
-
-    // Play scale
-    playScale(correct.intervals, direction);
+    const scale = question._original as typeof SCALES_GUIDE[number];
+    const direction = Math.random() > 0.5 ? 'ascending' : 'descending';
+    await playScale(scale.intervals, direction); // ← Rimuovi rootFreq
   };
 
-  const handleGuess = (index: number) => {
-    if (currentScaleIndex === null || showAnswer) return;
-
-    const isCorrect = index === currentScaleIndex;
-    setScore((prev) => ({
-      correct: prev.correct + (isCorrect ? 1 : 0),
-      total: prev.total + 1,
-    }));
-
-    recordAnswer('scales' as any, difficulty, isCorrect);
-
-    if (isCorrect) {
-      setFeedback('✅ Corretto!');
-    } else {
-      setFeedback(`❌ Sbagliato! Era: ${options[currentScaleIndex].name}`);
-    }
-    setShowAnswer(true);
-    setTimeLeft(null);
+  const getLabel = (q: TrainingQuestion) => {
+    const scale = q._original as typeof SCALES_GUIDE[number];
+    return scale.name;
   };
 
-  const repeatScale = () => {
-    if (currentScaleIndex === null) return;
-    playScale(options[currentScaleIndex].intervals, playDirection);
+  const getSubtitle = (q: TrainingQuestion) => {
+    const scale = q._original as typeof SCALES_GUIDE[number];
+    return `${scale.category} • ${scale.intervals.join('-')}`;
   };
-
-  const resetScore = () => {
-    setScore({ correct: 0, total: 0 });
-    setCurrentScaleIndex(null);
-    setOptions([]);
-    setFeedback('');
-    setShowAnswer(false);
-    setTimeLeft(null);
-    resetStreak();
-  };
-
-  const handleDifficultyChange = (newDifficulty: Difficulty) => {
-    setDifficulty(newDifficulty);
-    resetScore();
-  };
-
-  const accuracy = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 md:p-8">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <div className="flex items-center justify-center gap-2 mb-3">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <Piano className="w-6 md:w-8 h-6 md:h-8 text-blue-600 dark:text-blue-400" />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Scale Training
-            </h1>
-          </div>
-          </div>
-          <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
-            Riconosci la scala
-          </p>
-        </div>
-
-        {/* Difficulty Selector */}
-        <div className="mb-4">
-          <DifficultySelector difficulty={difficulty} onChange={handleDifficultyChange} />
-          <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 text-center mt-2">
-            {config.description}
-          </p>
-        </div>
-
-        {/* Stats Panel */}
-        <div className="mb-4">
-          <StatsPanel
-            quizType="scales"
-            currentCorrect={score.correct}
-            currentTotal={score.total}
-            currentStreak={currentStreak}
-            bestStreak={savedStats.bestStreak}
-            overallAccuracy={getOverallAccuracy('scales')}
-            lastPlayed={savedStats.lastPlayed}
-          />
-        </div>
-
-        {/* Current Session Stats */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-xl text-center">
-            <div className="text-xl md:text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {score.correct}
-            </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">Correct</div>
-          </div>
-          <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-xl text-center">
-            <div className="text-xl md:text-2xl font-bold text-purple-600 dark:text-purple-400">
-              {score.total}
-            </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">Total</div>
-          </div>
-          <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-xl text-center">
-            <div className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
-              {accuracy}%
-            </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">Accuracy</div>
-          </div>
-        </div>
-
-        {/* Timer & Direction */}
-        {timeLeft !== null && !showAnswer && (
-          <div className="mb-4 flex flex-col md:flex-row gap-2 md:gap-4">
-            <div className="flex-1 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-xl flex items-center justify-center gap-2">
-              <Clock className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
-              <span className="text-base md:text-lg font-bold text-yellow-600 dark:text-yellow-400">
-                {timeLeft}s
-              </span>
-            </div>
-            <div className="flex-1 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-xl flex items-center justify-center gap-2">
-              <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span className="text-sm md:text-base font-semibold text-blue-600 dark:text-blue-400">
-                {playDirection === 'ascending' ? '↑ Ascending' : '↓ Descending'}
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Controls */}
-        <div className="flex flex-col md:flex-row gap-3 mb-4">
-          <button
-            onClick={generateNewScale}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg text-sm md:text-base"
-          >
-            <Play className="w-5 h-5" />
-            {currentScaleIndex === null ? 'Start Quiz' : 'Next Question'}
-          </button>
-
-          {currentScaleIndex !== null && (
-            <button
-              onClick={repeatScale}
-              className="flex-1 md:flex-initial bg-gray-600 hover:bg-gray-700 text-white py-3 px-4 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg text-sm md:text-base"
-            >
-              <Volume2 className="w-5 h-5" />
-              Replay
-            </button>
-          )}
-
-          <button
-            onClick={resetScore}
-            className="md:w-auto bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-lg text-sm md:text-base"
-          >
-            <RotateCcw className="w-5 h-5" />
-            Reset
-          </button>
-        </div>
-
-        {/* Feedback */}
-        {feedback && (
-          <div
-            className={`mb-4 p-3 md:p-4 rounded-xl text-center text-sm md:text-base font-semibold ${
-              feedback.startsWith('✅')
-                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
-            }`}
-          >
-            {feedback}
-          </div>
-        )}
-
-        {/* Options */}
-        {currentScaleIndex !== null && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {options.map((scale, index) => (
-              <button
-                key={index}
-                onClick={() => handleGuess(index)}
-                disabled={showAnswer}
-                className={`p-3 md:p-4 rounded-xl font-semibold transition border-2 text-left ${
-                  showAnswer && index === currentScaleIndex
-                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-500'
-                    : showAnswer
-                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-300 dark:border-gray-600 cursor-not-allowed'
-                    : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20'
-                }`}
-              >
-                <div className="text-sm md:text-base">
-                  {config.showHints ? scale.name : `Scala ${index + 1}`}
-                </div>
-                {config.showHints && (
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {scale.formula}
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Tips */}
-        {currentScaleIndex === null && (
-          <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 p-4 md:p-6 rounded-xl">
-            <div className="flex items-start gap-3">
-              <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-1 shrink-0" />
-              <div className="text-xs md:text-sm text-gray-700 dark:text-gray-300">
-                <strong className="block mb-2">Tips:</strong>
-                <ul className="space-y-1 list-disc list-inside">
-                  <li><strong>Easy:</strong> Maggiore (allegro) vs Minore (triste)</li>
-                  <li><strong>Medium:</strong> Aggiunte armonica/melodica, pentatoniche</li>
-                  <li><strong>Hard:</strong> Modi greci + scale jazz</li>
-                  <li><strong>Pro:</strong> Tutte le scale, blind mode</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+    <GenericTraining
+      title="Scales Training"
+      description="Listen to scales and identify them. Train your modal ear!"
+      icon={TrendingUp}
+      accentColor="orange"
+      allQuestions={questions}
+      difficulties={SCALES_DIFFICULTY_CONFIG}
+      getDifficultyColor={getDifficultyColorWrapper}
+      playFunction={handlePlay}
+      statsCategory="scales"
+      showDifficulty={true}
+      showTimer={true}
+      showVisualizer={false}
+      getQuestionLabel={getLabel}
+      getQuestionSubtitle={getSubtitle}
+    />
   );
 };

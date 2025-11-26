@@ -1,5 +1,5 @@
 import { CategoryPage } from '../../components/ui/CategoryPage';
-import { Music, Music2, Piano } from 'lucide-react';
+import { Music, Music2, Piano, TrendingUp } from 'lucide-react';
 
 export const Musicians = () => {
   const learnSections = [
@@ -24,7 +24,7 @@ export const Musicians = () => {
     {
       title: 'Scale',
       description: 'Scopri tutte le scale principali con esempi pratici e teoria musicale.',
-      icon: Piano,
+      icon: TrendingUp,
       path: '/learn/scales',
       color: 'from-blue-700 to-indigo-700',
       features: ['Fondamentali', 'Modi','Pentatoniche','Jazz','Esotiche'],
@@ -52,7 +52,7 @@ export const Musicians = () => {
     {
       title: 'Scale Quiz',
       description: 'Metti alla prova la tua comprensione delle scale con questo quiz interattivo.',
-      icon: Piano,
+      icon: TrendingUp,
       path: '/train/scales',
       color: 'from-orange-500 to-orange-600',
       difficulty: 'Medio',

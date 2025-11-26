@@ -9,6 +9,7 @@ import { DifficultySelector } from '../../../components/ui/DifficultySelector';
 import { StatsPanel } from '../../../components/ui/StatsPanel';
 import { VOCAL_DIFFICULTY_CONFIG } from '../../../data/difficulty';
 
+
 type Difficulty = 'easy' | 'medium' | 'hard' | 'pro';
 
 export const VocalTraining = () => {

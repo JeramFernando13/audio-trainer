@@ -37,7 +37,7 @@ interface GenericTrainingProps {
   playFunction: (question: TrainingQuestion) => Promise<void>;
   
   // Stats tracking
-  statsCategory: 'rhythm' | 'intervals' | 'chords' | 'scales' | 'frequency' | 'vocal';
+  statsCategory: 'rhythm' | 'intervals' | 'chords' | 'scales' | 'frequency' | 'vocal'| 'sinewave';
   
   // Optional customization
   showDifficulty?: boolean;
