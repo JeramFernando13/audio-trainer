@@ -42,7 +42,7 @@ export const RhythmTraining = () => {
 
   return (
     <GenericTraining
-      title="Rhythm Recognition Training"
+      title="Rhythm Recognition "
       description="Listen to rhythm patterns and identify them. Train your rhythmic ear!"
       icon={Drum}
       accentColor="green"

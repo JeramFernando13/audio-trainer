@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { Play, RotateCcw, Clock, AlertCircle, Volume2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useStats } from '../../hooks/useStats';
+import { DifficultySelector } from '../ui/DifficultySelector';
+import { StatsPanel } from '../ui/StatsPanel';
+import type { Difficulty } from '../../data/difficulty';
 
 export interface TrainingQuestion {
   id: string;
@@ -37,7 +40,7 @@ interface GenericTrainingProps {
   playFunction: (question: TrainingQuestion) => Promise<void>;
   
   // Stats tracking
-  statsCategory: 'rhythm' | 'intervals' | 'chords' | 'scales' | 'frequency' | 'vocal'| 'sinewave';
+  statsCategory: 'rhythm' | 'intervals' | 'chords' | 'scales' | 'frequency' | 'vocal' | 'sinewave';
   
   // Optional customization
   showDifficulty?: boolean;
@@ -64,7 +67,6 @@ export const GenericTraining = ({
   renderVisualizer,
   getQuestionLabel = (q) => q.name,
   getQuestionSubtitle = (q) => q.description || '',
-  getDifficultyColor,
 }: GenericTrainingProps) => {
   const {
     currentStreak,
@@ -76,7 +78,7 @@ export const GenericTraining = ({
 
   // Difficulty state
   const defaultDifficulty = difficulties ? Object.keys(difficulties)[0] : 'default';
-  const [difficulty, setDifficulty] = useState<string>(defaultDifficulty);
+  const [difficulty, setDifficulty] = useState<Difficulty>(defaultDifficulty as Difficulty);
   
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number | null>(null);
   const [options, setOptions] = useState<TrainingQuestion[]>([]);
@@ -272,7 +274,7 @@ export const GenericTraining = ({
     resetStreak();
   };
 
-  const handleDifficultyChange = (newDifficulty: string) => {
+  const handleDifficultyChange = (newDifficulty: Difficulty) => {
     setDifficulty(newDifficulty);
     setScore({ correct: 0, total: 0 });
     resetStreak();
@@ -320,30 +322,12 @@ export const GenericTraining = ({
         </div>
 
         {/* Difficulty Selector */}
-        {showDifficulty && difficulties && (
+        {showDifficulty && (
           <div className="mb-6">
-            <div className="flex gap-2 mb-2">
-              {Object.entries(difficulties).map(([key, levelConfig]) => {
-                const isSelected = difficulty === key;
-                const difficultyColorClass = getDifficultyColor ? getDifficultyColor(key) : '';
-                
-                return (
-                  <button
-                    key={key}
-                    onClick={() => handleDifficultyChange(key)}
-                    className={`flex-1 py-2 px-4 rounded-lg font-semibold transition border-2 ${
-                      isSelected && getDifficultyColor
-                        ? `${difficultyColorClass} border-current`
-                        : isSelected
-                        ? `${colors.bg} ${colors.hover} text-white border-transparent`
-                        : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-300 dark:hover:bg-gray-600'
-                    }`}
-                  >
-                    {levelConfig.label}
-                  </button>
-                );
-              })}
-            </div>
+            <DifficultySelector 
+              difficulty={difficulty} 
+              onChange={handleDifficultyChange} 
+            />
             {config?.description && (
               <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">
                 {config.description}
@@ -352,46 +336,17 @@ export const GenericTraining = ({
           </div>
         )}
 
-        {/* Statistiche Sessione - Like ChordsTraining */}
-        <div className="mb-6 bg-linear-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-xl p-6">
-          <h2 className="text-xl font-bold text-white mb-4">
-            Statistiche Sessione
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-            <div className="bg-gray-800/50 p-4 rounded-xl text-center">
-              <div className={`text-2xl font-bold ${colors.text} ${colors.textDark}`}>
-                {score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0}%
-              </div>
-              <div className="text-xs text-gray-400">Sessione</div>
-            </div>
-            <div className="bg-gray-800/50 p-4 rounded-xl text-center">
-              <div className="text-2xl font-bold text-orange-500">
-                {currentStreak}
-              </div>
-              <div className="text-xs text-gray-400">Streak</div>
-            </div>
-            <div className="bg-gray-800/50 p-4 rounded-xl text-center">
-              <div className="text-2xl font-bold text-green-500">
-                {savedStats.bestStreak}
-              </div>
-              <div className="text-xs text-gray-400">Record</div>
-            </div>
-            <div className="bg-gray-800/50 p-4 rounded-xl text-center">
-              <div className="text-sm font-bold text-purple-400">
-                {savedStats.lastPlayed 
-                  ? new Date(savedStats.lastPlayed).toLocaleDateString('it-IT', { 
-                      day: 'numeric', 
-                      month: 'short' 
-                    })
-                  : 'Mai'}
-              </div>
-              <div className="text-xs text-gray-400">Ultima</div>
-            </div>
-          </div>
-          <div className="text-sm text-gray-400 flex items-center justify-between border-t border-gray-700 pt-3">
-            <span>Accuracy complessiva ({statsCategory}):</span>
-            <span className="text-lg font-bold text-blue-400">{overallAccuracy}%</span>
-          </div>
+        {/* Statistiche Sessione */}
+        <div className="mb-6">
+          <StatsPanel
+            quizType={statsCategory}
+            currentCorrect={score.correct}
+            currentTotal={score.total}
+            currentStreak={currentStreak}
+            bestStreak={savedStats.bestStreak}
+            overallAccuracy={overallAccuracy}
+            lastPlayed={savedStats.lastPlayed}
+          />
         </div>
 
         {/* Current Session Stats */}
