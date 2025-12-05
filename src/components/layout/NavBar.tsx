@@ -1,4 +1,4 @@
-import { AudioLines, GraduationCap, Target } from "lucide-react";
+import { AudioLines, GraduationCap, Target, Activity } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Dropdown } from "../ui/Dropdown";
 import { VolumeController } from '../audio/VolumeController';
@@ -31,14 +31,28 @@ export const NavBar = () => {
 
           {/* Controls - Colonna Destra */}
           <div className="flex items-center justify-end gap-2 sm:gap-4">
+
+            {/* DB Meter Button */}
+            <Link
+              to="/db-meter"
+              className="transition-colors group"
+              title="dB Meter">
+              <Activity className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors" />
+            </Link>            
+            
             {/* Metronome Button */}
             <Link
               to="/metronome"
               className="transition-colors group"
-              title="Metronome"
-            >
-              <Icon path={mdiMetronome} size={1} className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors" />
+              title="Metronome">
+                
+              <Icon 
+                path={mdiMetronome} 
+                size={1} 
+                className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors" 
+              />
             </Link>
+
 
             {/* Volume Control */}
             <VolumeController />

@@ -107,7 +107,7 @@ export const Metronome = ({
     <div className="bg-gray-800 rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <div className="text-2xl font-bold text-white">{bpm} BPM</div>
+          <div className="text-2xl font-bold text-white tracking-tight">{bpm} BPM</div>
           <div className="text-sm text-gray-400">{timeSignature} Time</div>
         </div>
         <button

@@ -34,6 +34,7 @@ import { SoundEngineers } from './pages/categories/SoundEngineers';
 import { RhythmLearn } from './pages/views/learn/RhythmLearn';
 import { RhythmTraining } from './pages/views/training/RhythmTraining';
 import { Metronome } from './pages/tools/MetronomePage';
+import { DbMeter } from './components/audio/DbMeter';
 
 function App() {
   return (
@@ -44,6 +45,8 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/metronome" element={<Metronome />} />
+              <Route path="/db-meter" element={<DbMeter />} />
+
 
               
               {/* Category Pages */}
