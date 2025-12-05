@@ -73,7 +73,7 @@ export const Metronome = () => {
           <div className="flex items-center gap-3 mb-2">
             <Clock className="w-8 h-8 text-purple-600 dark:text-purple-400" />
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Pro Metronome</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Metronome</h1>
               <p className="text-gray-600 dark:text-gray-400">
                 Metronomo professionale con tap tempo e suoni personalizzabili
               </p>

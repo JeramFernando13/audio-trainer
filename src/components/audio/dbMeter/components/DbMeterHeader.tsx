@@ -27,7 +27,7 @@ export function DbMeterHeader({
   return (
     <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
       <div>
-        <h2 className="text-3xl font-bold text-white mb-1">dB Meter Pro</h2>
+        <h2 className="text-3xl font-bold text-white mb-1">Db Meter </h2>
         <div className="flex items-center gap-3">
           <div className={`w-2.5 h-2.5 rounded-full ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-600'}`} />
           <span className="text-sm font-medium text-gray-400">
