@@ -167,7 +167,7 @@ export function DbMeter() {
     setCalibrationReference(rmsDb);
     toast.success('Calibrazione avviata! Vai al centro audience e premi "Completa Calibrazione"');
   };
-
+ 
   const handleCompleteCalibration = () => {
     if (calibrationReference === -Infinity) {
       toast.error('Nessuna calibrazione in corso');
